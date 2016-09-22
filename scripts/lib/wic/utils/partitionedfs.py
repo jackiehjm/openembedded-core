@@ -351,7 +351,7 @@ class Image():
                             (source, part['num'], part['start'],
                              part['start'] + part['size'] - 1, part['size']))
 
-                os.rename(source, image_file + '.p%d' % part['num'])
+                os.unlink(source)
 
     def create(self):
         for dev in self.disks:
