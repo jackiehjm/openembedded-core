@@ -28,6 +28,9 @@ APPEND_append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro
 # Generates test data file with data store variables expanded in json format
 ROOTFS_POSTPROCESS_COMMAND += "write_image_test_data ; "
 
+# Add support for /etc/ld.so.conf.d/*.conf if ldconfig is enabled
+ROOTFS_POSTINSTALL_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'add_ld_so_conf_d ;', '', d)}"
+
 # Write manifest
 IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.manifest"
 ROOTFS_POSTUNINSTALL_COMMAND =+ "write_image_manifest ; "
@@ -243,6 +246,16 @@ make_zimage_symlink_relative () {
 	if [ -L ${IMAGE_ROOTFS}/boot/zImage ]; then
 		(cd ${IMAGE_ROOTFS}/boot/ && for i in `ls zImage-* | sort`; do ln -sf $i zImage; done)
 	fi
+}
+
+# Add support for /etc/ld.so.conf.d/*.conf
+add_ld_so_conf_d() {
+    if [ -f ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf ]; then
+        if ! `grep -q 'include ld.so.conf.d\/\*.conf' /etc/ld.so.conf`; then
+            echo 'include ld.so.conf.d/*.conf' >> ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf
+        fi
+        mkdir -p ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf.d
+    fi
 }
 
 python write_image_manifest () {
