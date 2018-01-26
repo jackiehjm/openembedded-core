@@ -47,7 +47,7 @@ EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[grub-mount] = "--enable-grub-mount,--disable-grub-mount,fuse"
-PACKAGECONFIG[device-mapper] = "--enable-device-mapper,--disable-device-mapper,lvm2"
+PACKAGECONFIG[device-mapper] = "--enable-device-mapper,--disable-device-mapper,libdevmapper"
 
 # grub2 creates its own set of -nostdinc / -isystem / -ffreestanding CFLAGS and
 # OE's default BUILD_CFLAGS (assigned to CFLAGS for native builds) etc, conflict
@@ -67,12 +67,4 @@ do_configure_prepend() {
 	${S}/autogen.sh )
 }
 
-# grub and grub-efi's sysroot/${datadir}/grub/grub-mkconfig_lib are
-# conflicted, remove it since no one uses it.
-SYSROOT_DIRS_BLACKLIST += "${datadir}/grub/grub-mkconfig_lib"
-
-PACKAGES =+ "${PN}-editenv"
-
-FILES_${PN}-editenv = "${bindir}/grub-editenv"
-RDEPENDS_${PN} += "${PN}-editenv"
 RDEPENDS_${PN}_class-native = ""

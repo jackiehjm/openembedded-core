@@ -49,7 +49,7 @@ EXTRA_OECONF = "${PRINTF} ${CORECONF}"
 EXTRA_OECONF_class-native = "${CORECONF} --disable-selinux"
 
 # Tell configure that we'll have dbus-daemon on the target for the tests
-EXTRA_OECONF_class-target_append = " ${@bb.utils.contains('PTEST_ENABLED', '1', ' ac_cv_prog_DBUS_DAEMON=dbus-daemon', '', d)}"
+EXTRA_OECONF_append_class-target = " ${@bb.utils.contains('PTEST_ENABLED', '1', ' ac_cv_prog_DBUS_DAEMON=dbus-daemon', '', d)}"
 
 do_configure_prepend() {
 	sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/gio/gdbus-2.0/codegen/gdbus-codegen.in
@@ -85,6 +85,10 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 # doesn't support mips16e
 CPPFLAGS_append_class-target_mips16e = " -DNVALGRIND=1"
 
+# GLib generally requires gettext to be present so for USE_NLS to yes.  For
+# native builds as i18n is disabled globally we can tell it to use a fake msgfmt.
+USE_NLS_class-target = "yes"
+USE_NLS_class-nativesdk = "yes"
 CACHED_CONFIGUREVARS_append_class-native = " ac_cv_path_MSGFMT=/bin/false"
 
 do_install_append () {

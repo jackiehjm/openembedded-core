@@ -37,6 +37,7 @@ LICENSE = "\
     & Firmware-ath9k-htc \
     & Firmware-phanfw \
     & Firmware-qat \
+    & Firmware-qcom \
     & Firmware-qla1280 \
     & Firmware-qla2xxx \
     & Firmware-qualcommAthos_ar3k \
@@ -96,6 +97,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENCE.open-ath9k-htc-firmware;md5=1b33c9f4d17bc4d457bdb23727046837 \
     file://LICENCE.phanfw;md5=954dcec0e051f9409812b561ea743bfa \
     file://LICENCE.qat_firmware;md5=9e7d8bea77612d7cc7d9e9b54b623062 \
+    file://LICENSE.qcom;md5=164e3362a538eb11d3ac51e8e134294b \
     file://LICENCE.qla1280;md5=d6895732e622d950609093223a2c4f5d \
     file://LICENCE.qla2xxx;md5=505855e921b75f1be4a437ad9b79dff0 \
     file://LICENSE.QualcommAtheros_ar3k;md5=b5fe244fb2b532311de1472a3bc06da5 \
@@ -156,6 +158,7 @@ NO_GENERIC_LICENSE[Firmware-OLPC] = "LICENCE.OLPC"
 NO_GENERIC_LICENSE[Firmware-ath9k-htc] = "LICENCE.open-ath9k-htc-firmware"
 NO_GENERIC_LICENSE[Firmware-phanfw] = "LICENCE.phanfw"
 NO_GENERIC_LICENSE[Firmware-qat] = "LICENCE.qat_firmware"
+NO_GENERIC_LICENSE[Firmware-qcom] = "LICENSE.qcom"
 NO_GENERIC_LICENSE[Firmware-qla1280] = "LICENCE.qla1280"
 NO_GENERIC_LICENSE[Firmware-qla2xxx] = "LICENCE.qla2xxx"
 NO_GENERIC_LICENSE[Firmware-qualcommAthos_ar3k] = "LICENSE.QualcommAtheros_ar3k"
@@ -249,14 +252,19 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-iwlwifi-7260 \
              ${PN}-iwlwifi-7265 \
              ${PN}-iwlwifi-7265d ${PN}-iwlwifi-8000c ${PN}-iwlwifi-8265 \
+             ${PN}-iwlwifi-9000 \
              ${PN}-iwlwifi-misc \
              ${PN}-ibt-license ${PN}-ibt ${PN}-ibt-misc \
              ${PN}-ibt-11-5 ${PN}-ibt-12-16 ${PN}-ibt-hw-37-7 ${PN}-ibt-hw-37-8 \
+             ${PN}-ibt-17-16-1 \
              ${PN}-i915-license ${PN}-i915 \
              ${PN}-adsp-sst-license ${PN}-adsp-sst \
              ${PN}-bnx2-mips \
              ${PN}-netronome-license ${PN}-netronome \
              ${PN}-qat ${PN}-qat-license \
+             ${PN}-qcom-license \
+             ${PN}-qcom-venus-1.8 ${PN}-qcom-venus-4.2 \
+             ${PN}-qcom-adreno-a3xx ${PN}-qcom-adreno-a530 \
              ${PN}-whence-license \
              ${PN}-license \
              "
@@ -596,6 +604,7 @@ LICENSE_${PN}-iwlwifi-7265      = "Firmware-iwlwifi_firmware"
 LICENSE_${PN}-iwlwifi-7265d     = "Firmware-iwlwifi_firmware"
 LICENSE_${PN}-iwlwifi-8000c     = "Firmware-iwlwifi_firmware"
 LICENSE_${PN}-iwlwifi-8265      = "Firmware-iwlwifi_firmware"
+LICENSE_${PN}-iwlwifi-9000      = "Firmware-iwlwifi_firmware"
 LICENSE_${PN}-iwlwifi-misc      = "Firmware-iwlwifi_firmware"
 LICENSE_${PN}-iwlwifi-license   = "Firmware-iwlwifi_firmware"
 
@@ -622,6 +631,7 @@ FILES_${PN}-iwlwifi-7265   = "${nonarch_base_libdir}/firmware/iwlwifi-7265-*.uco
 FILES_${PN}-iwlwifi-7265d   = "${nonarch_base_libdir}/firmware/iwlwifi-7265D-*.ucode"
 FILES_${PN}-iwlwifi-8000c   = "${nonarch_base_libdir}/firmware/iwlwifi-8000C-*.ucode"
 FILES_${PN}-iwlwifi-8265   = "${nonarch_base_libdir}/firmware/iwlwifi-8265-*.ucode"
+FILES_${PN}-iwlwifi-9000   = "${nonarch_base_libdir}/firmware/iwlwifi-9000-*.ucode"
 FILES_${PN}-iwlwifi-misc   = "${nonarch_base_libdir}/firmware/iwlwifi-*.ucode"
 
 RDEPENDS_${PN}-iwlwifi-135-6     = "${PN}-iwlwifi-license"
@@ -645,6 +655,7 @@ RDEPENDS_${PN}-iwlwifi-7265      = "${PN}-iwlwifi-license"
 RDEPENDS_${PN}-iwlwifi-7265d     = "${PN}-iwlwifi-license"
 RDEPENDS_${PN}-iwlwifi-8000c     = "${PN}-iwlwifi-license"
 RDEPENDS_${PN}-iwlwifi-8265      = "${PN}-iwlwifi-license"
+RDEPENDS_${PN}-iwlwifi-9000      = "${PN}-iwlwifi-license"
 RDEPENDS_${PN}-iwlwifi-misc      = "${PN}-iwlwifi-license"
 
 # -iwlwifi-misc is a "catch all" package that includes all the iwlwifi
@@ -670,6 +681,7 @@ LICENSE_${PN}-ibt-hw-37-7 = "Firmware-ibt_firmware"
 LICENSE_${PN}-ibt-hw-37-8 = "Firmware-ibt_firmware"
 LICENSE_${PN}-ibt-11-5    = "Firmware-ibt_firmware"
 LICENSE_${PN}-ibt-12-16   = "Firmware-ibt_firmware"
+LICENSE_${PN}-ibt-17-16-1 = "Firmware-ibt_firmware"
 LICENSE_${PN}-ibt-misc    = "Firmware-ibt_firmware"
 
 FILES_${PN}-ibt-license = "${nonarch_base_libdir}/firmware/LICENCE.ibt_firmware"
@@ -677,12 +689,14 @@ FILES_${PN}-ibt-hw-37-7 = "${nonarch_base_libdir}/firmware/intel/ibt-hw-37.7*.bs
 FILES_${PN}-ibt-hw-37-8 = "${nonarch_base_libdir}/firmware/intel/ibt-hw-37.8*.bseq"
 FILES_${PN}-ibt-11-5    = "${nonarch_base_libdir}/firmware/intel/ibt-11-5.sfi /lib/firmware/intel/ibt-11-5.ddc"
 FILES_${PN}-ibt-12-16   = "${nonarch_base_libdir}/firmware/intel/ibt-12-16.sfi /lib/firmware/intel/ibt-12-16.ddc"
+FILES_${PN}-ibt-17-16-1 = "${nonarch_base_libdir}/firmware/intel/ibt-17-16-1.sfi /lib/firmware/intel/ibt-17-16-1.ddc"
 FILES_${PN}-ibt-misc    = "${nonarch_base_libdir}/firmware/ibt-*"
 
 RDEPENDS_${PN}-ibt-hw-37-7 = "${PN}-ibt-license"
 RDEPENDS_${PN}-ibt-hw-37.8 = "${PN}-ibt-license"
 RDEPENDS_${PN}-ibt-11-5    = "${PN}-ibt-license"
 RDEPENDS_${PN}-ibt-12-16   = "${PN}-ibt-license"
+RDEPENDS_${PN}-ibt-17-16-1 = "${PN}-ibt-license"
 RDEPENDS_${PN}-ibt-misc    = "${PN}-ibt-license"
 
 ALLOW_EMPTY_${PN}-ibt= "1"
@@ -706,6 +720,18 @@ LICENSE_${PN}-qat-license = "Firmware-qat"
 FILES_${PN}-qat-license   = "${nonarch_base_libdir}/firmware/LICENCE.qat_firmware"
 FILES_${PN}-qat           = "${nonarch_base_libdir}/firmware/qat*.bin"
 RDEPENDS_${PN}-qat        = "${PN}-qat-license"
+
+# For QCOM VPU/GPU
+LICENSE_${PN}-qcom-license = "Firmware-qcom"
+FILES_${PN}-qcom-license   = "${nonarch_base_libdir}/firmware/LICENSE.qcom ${nonarch_base_libdir}/firmware/qcom/NOTICE.txt"
+FILES_${PN}-qcom-venus-1.8 = "${nonarch_base_libdir}/firmware/qcom/venus-1.8/*"
+FILES_${PN}-qcom-venus-4.2 = "${nonarch_base_libdir}/firmware/qcom/venus-4.2/*"
+FILES_${PN}-qcom-adreno-a3xx = "${nonarch_base_libdir}/firmware/qcom/a300_*.fw ${nonarch_base_libdir}/firmware/a300_*.fw"
+FILES_${PN}-qcom-adreno-a530 = "${nonarch_base_libdir}/firmware/qcom/a530*.*"
+RDEPENDS_${PN}-qcom-venus-1.8 = "${PN}-qcom-license"
+RDEPENDS_${PN}-qcom-venus-1.8 = "${PN}-qcom-license"
+RDEPENDS_${PN}-qcom-adreno-a3xx = "${PN}-qcom-license"
+RDEPENDS_${PN}-qcom-adreno-a530 = "${PN}-qcom-license"
 
 # For other firmwares
 # Maybe split out to separate packages when needed.
@@ -737,6 +763,7 @@ LICENSE_${PN} = "\
     & Firmware-ath9k-htc \
     & Firmware-phanfw \
     & Firmware-qat \
+    & Firmware-qcom \
     & Firmware-qla1280 \
     & Firmware-qla2xxx \
     & Firmware-r8a779x_usb3 \
