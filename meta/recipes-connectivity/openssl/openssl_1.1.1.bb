@@ -18,6 +18,8 @@ SRC_URI = "http://www.openssl.org/source/openssl-${PV}.tar.gz \
            file://0001-Create-the-.rnd-file-it-it-does-not-exist.patch \
            file://0002-fix-CVE-2018-0734.patch \
            file://0003-fix-CVE-2018-0735.patch \
+           file://0001-Allow-parallel-install.patch \
+           file://0001-Have-install-targets-depend-on-more-precise-build-ta.patch \
            "
 
 SRC_URI_append_class-nativesdk = " \

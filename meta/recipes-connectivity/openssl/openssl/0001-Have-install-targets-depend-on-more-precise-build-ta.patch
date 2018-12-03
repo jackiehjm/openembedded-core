@@ -1,0 +1,149 @@
+From d83bc450939c84cc7f5e99c8d6d6368f3e379ac6 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 20 Nov 2018 09:57:23 +0800
+Subject: [PATCH] Have install targets depend on more precise build targets
+
+We only had the main 'install' target depend on 'all'.  This changes
+the dependencies so targets like install_dev, install_runtime_libs,
+install_engines and install_programs depend on build targets that are
+correspond to them more specifically.  This increases the parallel
+possibilities.
+
+Fixes #7466
+
+Reviewed-by: Paul Dale <paul.dale@oracle.com>
+(Merged from #7583)
+
+Upstream-Status: Backport [https://github.com/openssl/openssl/commit/
+201a33f4abb639527da28e83e6ae782907a1c114]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Configurations/descrip.mms.tmpl      | 8 ++++----
+ Configurations/unix-Makefile.tmpl    | 8 ++++----
+ Configurations/windows-makefile.tmpl | 8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/Configurations/descrip.mms.tmpl b/Configurations/descrip.mms.tmpl
+index 4a16c97..6e393e3 100644
+--- a/Configurations/descrip.mms.tmpl
++++ b/Configurations/descrip.mms.tmpl
+@@ -513,7 +513,7 @@ descrip.mms : FORCE
+ 
+ # Install helper targets #############################################
+ 
+-install_sw : all install_dev install_engines install_runtime -
++install_sw : install_dev install_engines install_runtime -
+              install_startup install_ivp
+ 
+ uninstall_sw : uninstall_dev uninstall_engines uninstall_runtime -
+@@ -556,7 +556,7 @@ install_dev : check_INSTALLTOP install_runtime_libs
+                 map { "COPY/PROT=W:R $_.OLB ossl_installroot:[LIB.'arch']" }
+                 @install_libs) -}
+ 
+-install_engines : check_INSTALLTOP
++install_engines : check_INSTALLTOP install_runtime_libs build_engines
+         @ {- output_off() unless scalar @{$unified_info{engines}}; "" -} !
+         @ WRITE SYS$OUTPUT "*** Installing engines"
+         - CREATE/DIR ossl_installroot:[ENGINES{- $sover_dirname.$target{pointer_size} -}.'arch']
+@@ -567,7 +567,7 @@ install_engines : check_INSTALLTOP
+ 
+ install_runtime: install_programs
+ 
+-install_runtime_libs : check_INSTALLTOP
++install_runtime_libs : check_INSTALLTOP build_libs
+         @ {- output_off() if $disabled{shared}; "" -} !
+         @ WRITE SYS$OUTPUT "*** Installing shareable images"
+         @ ! Install shared (runtime) libraries
+@@ -577,7 +577,7 @@ install_runtime_libs : check_INSTALLTOP
+                 @install_shlibs) -}
+         @ {- output_on() if $disabled{shared}; "" -} !
+ 
+-install_programs : check_INSTALLTOP install_runtime_libs
++install_programs : check_INSTALLTOP install_runtime_libs build_programs
+         @ {- output_off() if $disabled{apps}; "" -} !
+         @ ! Install the main program
+         - CREATE/DIR ossl_installroot:[EXE.'arch']
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index 8d3f9d1..39642ae 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -437,7 +437,7 @@ depend:
+ 
+ # Install helper targets #############################################
+ 
+-install_sw: all install_dev install_engines install_runtime
++install_sw: install_dev install_engines install_runtime
+ 
+ uninstall_sw: uninstall_runtime uninstall_engines uninstall_dev
+ 
+@@ -607,7 +607,7 @@ uninstall_dev: uninstall_runtime_libs
+ 	-$(RMDIR) $(DESTDIR)$(libdir)/pkgconfig
+ 	-$(RMDIR) $(DESTDIR)$(libdir)
+ 
+-install_engines:
++install_engines: install_runtime_libs build_engines
+ 	@[ -n "$(INSTALLTOP)" ] || (echo INSTALLTOP should not be empty; exit 1)
+ 	@$(PERL) $(SRCDIR)/util/mkdir-p.pl $(DESTDIR)$(ENGINESDIR)/
+ 	@$(ECHO) "*** Installing engines"
+@@ -636,7 +636,7 @@ uninstall_engines:
+ 
+ install_runtime: install_programs
+ 
+-install_runtime_libs:
++install_runtime_libs: build_libs
+ 	@[ -n "$(INSTALLTOP)" ] || (echo INSTALLTOP should not be empty; exit 1)
+ 	@ : {- output_off() if windowsdll(); "" -}
+ 	@$(PERL) $(SRCDIR)/util/mkdir-p.pl $(DESTDIR)$(libdir)
+@@ -660,7 +660,7 @@ install_runtime_libs:
+ 		: {- output_on() if windowsdll(); "" -}; \
+ 	done
+ 
+-install_programs: install_runtime_libs
++install_programs: install_runtime_libs build_programs
+ 	@[ -n "$(INSTALLTOP)" ] || (echo INSTALLTOP should not be empty; exit 1)
+ 	@$(PERL) $(SRCDIR)/util/mkdir-p.pl $(DESTDIR)$(INSTALLTOP)/bin
+ 	@$(ECHO) "*** Installing runtime programs"
+diff --git a/Configurations/windows-makefile.tmpl b/Configurations/windows-makefile.tmpl
+index 2bc54b8..e996553 100644
+--- a/Configurations/windows-makefile.tmpl
++++ b/Configurations/windows-makefile.tmpl
+@@ -381,7 +381,7 @@ depend:
+ 
+ # Install helper targets #############################################
+ 
+-install_sw: all install_dev install_engines install_runtime
++install_sw: install_dev install_engines install_runtime
+ 
+ uninstall_sw: uninstall_runtime uninstall_engines uninstall_dev
+ 
+@@ -426,7 +426,7 @@ install_dev: install_runtime_libs
+ 
+ uninstall_dev:
+ 
+-install_engines:
++install_engines: install_runtime_libs build_engines
+ 	@if "$(INSTALLTOP)"=="" ( $(ECHO) "INSTALLTOP should not be empty" & exit 1 )
+ 	@$(ECHO) "*** Installing engines"
+ 	@"$(PERL)" "$(SRCDIR)\util\mkdir-p.pl" "$(ENGINESDIR)"
+@@ -439,7 +439,7 @@ uninstall_engines:
+ 
+ install_runtime: install_programs
+ 
+-install_runtime_libs:
++install_runtime_libs: build_libs
+ 	@if "$(INSTALLTOP)"=="" ( $(ECHO) "INSTALLTOP should not be empty" & exit 1 )
+ 	@$(ECHO) "*** Installing runtime libraries"
+ 	@"$(PERL)" "$(SRCDIR)\util\mkdir-p.pl" "$(INSTALLTOP)\bin"
+@@ -448,7 +448,7 @@ install_runtime_libs:
+ 	@if not "$(SHLIBS)"=="" \
+ 	 "$(PERL)" "$(SRCDIR)\util\copy.pl" $(INSTALL_SHLIBPDBS) \
+                                         "$(INSTALLTOP)\bin"
+-install_programs: install_runtime_libs
++install_programs: install_runtime_libs build_programs
+ 	@if "$(INSTALLTOP)"=="" ( $(ECHO) "INSTALLTOP should not be empty" & exit 1 )
+ 	@$(ECHO) "*** Installing runtime programs"
+ 	@"$(PERL)" "$(SRCDIR)\util\mkdir-p.pl" "$(INSTALLTOP)\bin"
+-- 
+2.7.4
+
