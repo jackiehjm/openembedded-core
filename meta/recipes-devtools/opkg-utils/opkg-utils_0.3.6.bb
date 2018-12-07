@@ -31,7 +31,8 @@ PACKAGECONFIG = "python update-alternatives"
 PACKAGECONFIG[python] = ",,,${PYTHONRDEPS}"
 PACKAGECONFIG[update-alternatives] = ",,,"
 
-OPKGLIBDIR ?= "/var/lib"
+target_localstatedir := "${localstatedir}"
+OPKGLIBDIR = "${target_localstatedir}/lib"
 
 do_install() {
 	oe_runmake PREFIX=${prefix} DESTDIR=${D} install
