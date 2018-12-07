@@ -1,0 +1,87 @@
+From 1fd6afb571e85fbc37ffb522646e7ec2c6e4a11e Mon Sep 17 00:00:00 2001
+From: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Date: Thu, 13 Sep 2018 18:25:37 +0200
+Subject: [PATCH] Create the .rnd file it it does not exist
+
+It's a bit annoying, since some commands try to read a .rnd file,
+and print an error message if the file does not exist.
+
+But previously a .rnd file was created on exit, and that does no longer
+happen.
+
+Fixed by continuing in app_RAND_load_conf regardless of the error in
+RAND_load_file.
+
+If the random number generator is still not initalized on exit, the
+function RAND_write_file will fail and no .rnd file would be created.
+
+Remove RANDFILE from openssl.cnf
+
+Reviewed-by: Kurt Roeckx <kurt@roeckx.be>
+(Merged from https://github.com/openssl/openssl/pull/7217)
+
+(cherry picked from commit 0f58220973a02248ca5c69db59e615378467b9c8)
+
+Upstream-Status: Backport [https://github.com/openssl/openssl.git]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ apps/app_rand.c      | 1 -
+ apps/openssl-vms.cnf | 2 --
+ apps/openssl.cnf     | 2 --
+ 3 files changed, 5 deletions(-)
+
+diff --git a/apps/app_rand.c b/apps/app_rand.c
+index 28caad4..d0b2e83 100644
+--- a/apps/app_rand.c
++++ b/apps/app_rand.c
+@@ -26,7 +26,6 @@ void app_RAND_load_conf(CONF *c, const char *section)
+     if (RAND_load_file(randfile, -1) < 0) {
+         BIO_printf(bio_err, "Can't load %s into RNG\n", randfile);
+         ERR_print_errors(bio_err);
+-        return;
+     }
+     if (save_rand_file == NULL)
+         save_rand_file = OPENSSL_strdup(randfile);
+diff --git a/apps/openssl-vms.cnf b/apps/openssl-vms.cnf
+index f4a2511..178a0b0 100644
+--- a/apps/openssl-vms.cnf
++++ b/apps/openssl-vms.cnf
+@@ -10,7 +10,6 @@
+ # This definition stops the following lines choking if HOME isn't
+ # defined.
+ HOME			= .
+-RANDFILE		= $ENV::HOME/.rnd
+ 
+ # Extra OBJECT IDENTIFIER info:
+ #oid_file		= $ENV::HOME/.oid
+@@ -57,7 +56,6 @@ crlnumber	= $dir]crlnumber.	# the current crl number
+ 					# must be commented out to leave a V1 CRL
+ crl		= $dir]crl.pem 		# The current CRL
+ private_key	= $dir.private]cakey.pem# The private key
+-RANDFILE	= $dir.private].rand	# private random number file
+ 
+ x509_extensions	= usr_cert		# The extensions to add to the cert
+ 
+diff --git a/apps/openssl.cnf b/apps/openssl.cnf
+index 7d1a8bb..6df2878 100644
+--- a/apps/openssl.cnf
++++ b/apps/openssl.cnf
+@@ -10,7 +10,6 @@
+ # This definition stops the following lines choking if HOME isn't
+ # defined.
+ HOME			= .
+-RANDFILE		= $ENV::HOME/.rnd
+ 
+ # Extra OBJECT IDENTIFIER info:
+ #oid_file		= $ENV::HOME/.oid
+@@ -57,7 +56,6 @@ crlnumber	= $dir/crlnumber	# the current crl number
+ 					# must be commented out to leave a V1 CRL
+ crl		= $dir/crl.pem 		# The current CRL
+ private_key	= $dir/private/cakey.pem# The private key
+-RANDFILE	= $dir/private/.rand	# private random number file
+ 
+ x509_extensions	= usr_cert		# The extensions to add to the cert
+ 
+-- 
+2.7.4
+
