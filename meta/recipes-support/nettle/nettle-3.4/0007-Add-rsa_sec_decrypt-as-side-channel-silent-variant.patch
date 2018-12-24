@@ -1,0 +1,180 @@
+From bfda54eeb2e5aa0916dc87d38a5d66c6dfb0359d Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Wed, 10 Oct 2018 16:15:49 -0400
+Subject: [PATCH] Add rsa_sec_decrypt as side-channel silent variant
+
+Use side-channel silent RSA root function as well as PKCS1 padding
+functions.
+This variant accepts only a fixed length message, and returns error
+if the pkcs1 padding returns a different length message.
+The buffer is always left unchanged on error so that a TLS
+implementation can pre-initialize it with a random key to use on
+decoding error.
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ Makefile.in                  |    3 +-
+ rsa-sec-decrypt.c            |   72 ++++++++++++++++++++++++++++++++++++++++++
+ rsa.h                        |   10 ++++++
+ testsuite/rsa-encrypt-test.c |   24 ++++++++++++++
+ 4 files changed, 108 insertions(+), 1 deletion(-)
+ create mode 100644 rsa-sec-decrypt.c
+
+diff --git a/Makefile.in b/Makefile.in
+index 6f2e03e..728d6af 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -157,7 +157,8 @@ hogweed_SOURCES = sexp.c sexp-format.c \
+ 		  rsa-sha512-sign.c rsa-sha512-sign-tr.c rsa-sha512-verify.c \
+ 		  rsa-pss-sha256-sign-tr.c rsa-pss-sha256-verify.c \
+ 		  rsa-pss-sha512-sign-tr.c rsa-pss-sha512-verify.c \
+-		  rsa-encrypt.c rsa-decrypt.c rsa-decrypt-tr.c \
++		  rsa-encrypt.c rsa-decrypt.c \
++		  rsa-sec-decrypt.c rsa-decrypt-tr.c \
+ 		  rsa-keygen.c rsa-blind.c \
+ 		  rsa2sexp.c sexp2rsa.c \
+ 		  dsa.c dsa-compat.c dsa-compat-keygen.c dsa-gen-params.c \
+diff --git a/rsa-sec-decrypt.c b/rsa-sec-decrypt.c
+new file mode 100644
+index 0000000..35dbe16
+--- /dev/null
++++ b/rsa-sec-decrypt.c
+@@ -0,0 +1,72 @@
++/* rsa-sec-decrypt.c
++
++   RSA decryption, using randomized RSA blinding to be more resistant
++   to side-channel attacks like timing attacks or cache based memory
++   access measurements.
++
++   Copyright (C) 2001, 2012 Niels Möller, Nikos Mavrogiannopoulos
++   Copyright (C) 2018 Red Hat, Inc.
++
++   This file is part of GNU Nettle.
++
++   GNU Nettle is free software: you can redistribute it and/or
++   modify it under the terms of either:
++
++     * the GNU Lesser General Public License as published by the Free
++       Software Foundation; either version 3 of the License, or (at your
++       option) any later version.
++
++   or
++
++     * the GNU General Public License as published by the Free
++       Software Foundation; either version 2 of the License, or (at your
++       option) any later version.
++
++   or both in parallel, as here.
++
++   GNU Nettle is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received copies of the GNU General Public License and
++   the GNU Lesser General Public License along with this program.  If
++   not, see http://www.gnu.org/licenses/.
++*/
++
++#if HAVE_CONFIG_H
++# include "config.h"
++#endif
++
++#include "rsa.h"
++#include "rsa-internal.h"
++
++#include "gmp-glue.h"
++
++int
++rsa_sec_decrypt(const struct rsa_public_key *pub,
++	        const struct rsa_private_key *key,
++	        void *random_ctx, nettle_random_func *random,
++	        size_t length, uint8_t *message,
++	        const mpz_t gibberish)
++{
++  TMP_GMP_DECL (m, mp_limb_t);
++  TMP_GMP_DECL (em, uint8_t);
++  int res;
++
++  TMP_GMP_ALLOC (m, mpz_size(pub->n));
++  TMP_GMP_ALLOC (em, key->size);
++
++  res = rsa_sec_compute_root_tr (pub, key, random_ctx, random, m,
++                                 mpz_limbs_read(gibberish),
++                                 mpz_size(gibberish));
++
++  mpn_get_base256 (em, key->size, m, mpz_size(pub->n));
++
++  res &= _pkcs1_sec_decrypt (length, message, key->size, em);
++
++  TMP_GMP_FREE (em);
++  TMP_GMP_FREE (m);
++  return res;
++}
++
+diff --git a/rsa.h b/rsa.h
+index 1be7dba..108bc7d 100644
+--- a/rsa.h
++++ b/rsa.h
+@@ -88,6 +88,7 @@ extern "C" {
+ #define rsa_encrypt nettle_rsa_encrypt
+ #define rsa_decrypt nettle_rsa_decrypt
+ #define rsa_decrypt_tr nettle_rsa_decrypt_tr
++#define rsa_sec_decrypt nettle_rsa_sec_decrypt
+ #define rsa_compute_root nettle_rsa_compute_root
+ #define rsa_compute_root_tr nettle_rsa_compute_root_tr
+ #define rsa_sec_compute_root_tr _nettle_rsa_sec_compute_root_tr
+@@ -424,6 +425,15 @@ rsa_decrypt_tr(const struct rsa_public_key *pub,
+ 	       size_t *length, uint8_t *message,
+ 	       const mpz_t gibberish);
+ 
++/* like rsa_decrypt_tr but with additional side-channel resistance.
++ * NOTE: the length of the final message must be known in advance. */
++int
++rsa_sec_decrypt(const struct rsa_public_key *pub,
++	        const struct rsa_private_key *key,
++	        void *random_ctx, nettle_random_func *random,
++	        size_t length, uint8_t *message,
++	        const mpz_t gibberish);
++
+ /* Compute x, the e:th root of m. Calling it with x == m is allowed. */
+ void
+ rsa_compute_root(const struct rsa_private_key *key,
+diff --git a/testsuite/rsa-encrypt-test.c b/testsuite/rsa-encrypt-test.c
+index 93053a7..a7397b5 100644
+--- a/testsuite/rsa-encrypt-test.c
++++ b/testsuite/rsa-encrypt-test.c
+@@ -76,6 +76,30 @@ test_main(void)
+   ASSERT(MEMEQ(msg_length, msg, decrypted));
+   ASSERT(decrypted[msg_length] == after);
+ 
++  /* test side channel resistant variant */
++  knuth_lfib_random (&lfib, msg_length + 1, decrypted);
++  after = decrypted[msg_length];
++  decrypted_length = msg_length;
++
++  ASSERT(rsa_sec_decrypt(&pub, &key,
++                         &lfib, (nettle_random_func *) knuth_lfib_random,
++                         decrypted_length, decrypted, gibberish));
++  ASSERT(MEMEQ(msg_length, msg, decrypted));
++  ASSERT(decrypted[msg_length] == after);
++
++  /* test invalid length to rsa_sec_decrypt */
++  knuth_lfib_random (&lfib, msg_length + 1, decrypted);
++  decrypted_length = msg_length - 1;
++  after = decrypted[decrypted_length] = 'X';
++  decrypted[0] = 'A';
++
++  ASSERT(!rsa_sec_decrypt(&pub, &key,
++                          &lfib, (nettle_random_func *) knuth_lfib_random,
++                          decrypted_length, decrypted, gibberish));
++  ASSERT(decrypted[decrypted_length] == after);
++  ASSERT(decrypted[0] == 'A');
++
++
+   /* Test invalid key. */
+   mpz_add_ui (key.q, key.q, 2);
+   decrypted_length = key.size;
+-- 
+1.7.9.5
+

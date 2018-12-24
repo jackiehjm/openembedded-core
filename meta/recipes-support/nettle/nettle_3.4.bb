@@ -14,6 +14,20 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://Add-target-to-only-build-tests-not-run-them.patch \
            file://run-ptest \
            file://check-header-files-of-openssl-only-if-enable_.patch \
+           file://0001-Add-convenience-macro-for-size-calculation.patch \
+           file://0001-Add-side-channel-silent-RSA-root-function.patch \
+           file://0002-Use-side-channel-silent-root-for-rsa-signatures.patch \
+           file://0003-Add-a-side-channel-silent-conditional-memcpy.patch \
+           file://0004-Add-side-channel-silent-pkcs1-decoding-function.patch \
+           file://0005-Add-mpn_get_base256.patch \
+           file://0006-Unit-test-for-pkcs1-sec-decrypt.patch \
+           file://0007-Add-rsa_sec_decrypt-as-side-channel-silent-variant.patch \
+           file://0008-Unit-test-for-rsa_sec_decyrpt.patch \
+           file://0009-Add-variable-len-pkcs1-sec-decoding-function.patch \
+           file://0010-Use-side-channel-silent-pkcs1-in-rsa_decrypt_tr.patch \
+           file://0011-Catch-bad-private-keys-early-on.patch \
+           file://0012-Randomzed-testing-of-rsa-sec-compute-root.patch \
+           file://0013-Switch-rsa_compute_root-to-use-side-channel-safe-var.patch \
            "
 
 SRC_URI_append_class-target = "\

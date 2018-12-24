@@ -1,0 +1,140 @@
+From 9d4c4836733f77941039262c64d4dc1676f52d06 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Thu, 8 Nov 2018 14:38:12 -0500
+Subject: [PATCH] Add side-channel silent pkcs1 decoding function
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ Makefile.in         |    1 +
+ pkcs1-sec-decrypt.c |   82 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ rsa-internal.h      |    8 +++++
+ 3 files changed, 91 insertions(+)
+ create mode 100644 pkcs1-sec-decrypt.c
+
+diff --git a/Makefile.in b/Makefile.in
+index 9c5694c..6f2e03e 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -144,6 +144,7 @@ hogweed_SOURCES = sexp.c sexp-format.c \
+ 		  bignum.c bignum-random.c bignum-random-prime.c \
+ 		  sexp2bignum.c \
+ 		  pkcs1.c pkcs1-encrypt.c pkcs1-decrypt.c \
++		  pkcs1-sec-decrypt.c \
+ 		  pkcs1-rsa-digest.c pkcs1-rsa-md5.c pkcs1-rsa-sha1.c \
+ 		  pkcs1-rsa-sha256.c pkcs1-rsa-sha512.c \
+ 		  pss.c pss-mgf1.c \
+diff --git a/pkcs1-sec-decrypt.c b/pkcs1-sec-decrypt.c
+new file mode 100644
+index 0000000..3ab4a48
+--- /dev/null
++++ b/pkcs1-sec-decrypt.c
+@@ -0,0 +1,82 @@
++/* pkcs1-sec-decrypt.c
++
++   The RSA publickey algorithm. Side channel resistant PKCS#1 decryption.
++
++   Copyright (C) 2001, 2012 Niels Möller
++   Copyright (C) 2018 Red Hat, Inc.
++
++   This file is part of GNU Nettle.
++
++   GNU Nettle is free software: you can redistribute it and/or
++   modify it under the terms of either:
++
++     * the GNU Lesser General Public License as published by the Free
++       Software Foundation; either version 3 of the License, or (at your
++       option) any later version.
++
++   or
++
++     * the GNU General Public License as published by the Free
++       Software Foundation; either version 2 of the License, or (at your
++       option) any later version.
++
++   or both in parallel, as here.
++
++   GNU Nettle is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received copies of the GNU General Public License and
++   the GNU Lesser General Public License along with this program.  If
++   not, see http://www.gnu.org/licenses/.
++*/
++
++#if HAVE_CONFIG_H
++# include "config.h"
++#endif
++
++#include <assert.h>
++
++#include <string.h>
++
++#include "memops.h"
++
++#include "gmp-glue.h"
++#include "rsa.h"
++#include "rsa-internal.h"
++
++/* Inputs are always cast to uint32_t values. But all values used in this
++ * function should never exceed the maximum value of a uint32_t anyway.
++ * these macros returns 1 on success, 0 on failure */
++#define NOT_EQUAL(a, b) \
++    ((0U - ((uint32_t)(a) ^ (uint32_t)(b))) >> 31)
++#define EQUAL(a, b) \
++    ((((uint32_t)(a) ^ (uint32_t)(b)) - 1U) >> 31)
++
++int
++_pkcs1_sec_decrypt (size_t length, uint8_t *message,
++                    size_t padded_message_length,
++                    const volatile uint8_t *padded_message)
++{
++  volatile int ok;
++  size_t i, t;
++
++  assert (padded_message_length >= length);
++
++  t = padded_message_length - length - 1;
++
++  /* Check format, padding, message_size */
++  ok = EQUAL(padded_message[0], 0);       /* ok if padded_message[0] == 0 */
++  ok &= EQUAL(padded_message[1], 2);      /* ok if padded_message[1] == 2 */
++  for (i = 2; i < t; i++)      /* check padding has no zeros */
++    {
++      ok &= NOT_EQUAL(padded_message[i], 0);
++    }
++  ok &= EQUAL(padded_message[t], 0);      /* ok if terminator == 0 */
++
++  /* fill destination buffer regardless of outcome */
++  cnd_memcpy(ok, message, padded_message + t + 1, length);
++
++  return ok;
++}
+diff --git a/rsa-internal.h b/rsa-internal.h
+index 4930bb9..537ce5c 100644
+--- a/rsa-internal.h
++++ b/rsa-internal.h
+@@ -38,6 +38,7 @@
+ 
+ #define _rsa_sec_compute_root_itch _nettle_rsa_sec_compute_root_itch
+ #define _rsa_sec_compute_root _nettle_rsa_sec_compute_root
++#define _pkcs1_sec_decrypt _nettle_pkcs1_sec_decrypt
+ 
+ /* side-channel silent root computation */
+ mp_size_t
+@@ -47,4 +48,11 @@ _rsa_sec_compute_root(const struct rsa_private_key *key,
+                       mp_limb_t *rp, const mp_limb_t *mp,
+                       mp_limb_t *scratch);
+ 
++/* additional resistance to memory access side-channel attacks.
++ * Note: message buffer is returned unchanged on error */
++int
++_pkcs1_sec_decrypt (size_t length, uint8_t *message,
++                    size_t padded_message_length,
++                    const volatile uint8_t *padded_message);
++
+ #endif /* NETTLE_RSA_INTERNAL_H_INCLUDED */
+-- 
+1.7.9.5
+

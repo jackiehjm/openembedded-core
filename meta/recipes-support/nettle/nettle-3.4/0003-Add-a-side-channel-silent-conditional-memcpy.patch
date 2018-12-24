@@ -1,0 +1,195 @@
+From f554a317d741c2fe8cd891ac0fcd6c38d0c49ace Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 15 Oct 2018 15:02:50 -0400
+Subject: [PATCH] Add a side-channel silent conditional memcpy
+
+Originally from Niels, with minor changes to avoid compiler warnings.
+---
+ Makefile.in                 |    1 +
+ cnd-memcpy.c                |   55 +++++++++++++++++++++++++++++++++++++++++++
+ memops.h                    |    6 +++++
+ testsuite/.gitignore        |    1 +
+ testsuite/.test-rules.make  |    3 +++
+ testsuite/Makefile.in       |    1 +
+ testsuite/cnd-memcpy-test.c |   47 ++++++++++++++++++++++++++++++++++++
+ 7 files changed, 114 insertions(+)
+ create mode 100644 cnd-memcpy.c
+ create mode 100644 testsuite/cnd-memcpy-test.c
+
+diff --git a/Makefile.in b/Makefile.in
+index 7740d71..9c5694c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -92,6 +92,7 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
+ 		 camellia256-meta.c \
+ 		 cast128.c cast128-meta.c cbc.c \
+ 		 ccm.c ccm-aes128.c ccm-aes192.c ccm-aes256.c cfb.c \
++		 cnd-memcpy.c \
+ 		 chacha-crypt.c chacha-core-internal.c \
+ 		 chacha-poly1305.c chacha-poly1305-meta.c \
+ 		 chacha-set-key.c chacha-set-nonce.c \
+diff --git a/cnd-memcpy.c b/cnd-memcpy.c
+new file mode 100644
+index 0000000..4aaee78
+--- /dev/null
++++ b/cnd-memcpy.c
+@@ -0,0 +1,55 @@
++/* cnd-memcpy.c
++
++   Copyright (C) 2018 Niels Möller
++
++   This file is part of GNU Nettle.
++
++   GNU Nettle is free software: you can redistribute it and/or
++   modify it under the terms of either:
++
++     * the GNU Lesser General Public License as published by the Free
++       Software Foundation; either version 3 of the License, or (at your
++       option) any later version.
++
++   or
++
++     * the GNU General Public License as published by the Free
++       Software Foundation; either version 2 of the License, or (at your
++       option) any later version.
++
++   or both in parallel, as here.
++
++   GNU Nettle is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received copies of the GNU General Public License and
++   the GNU Lesser General Public License along with this program.  If
++   not, see http://www.gnu.org/licenses/.
++*/
++
++#if HAVE_CONFIG_H
++# include "config.h"
++#endif
++
++#include "memops.h"
++
++void
++cnd_memcpy(int cnd, volatile void *dst, const volatile void *src, size_t n)
++{
++  const volatile unsigned char *sp = src;
++  volatile unsigned char *dp = dst;
++  volatile unsigned char c;
++  volatile unsigned char m;
++  size_t i;
++
++  m = -(unsigned char) cnd;
++
++  for (i = 0; i < n; i++)
++    {
++      c = (sp[i] & m);
++      c |= (dp[i] & ~m);
++      dp[i] = c;
++    }
++}
+diff --git a/memops.h b/memops.h
+index 8e40594..815d547 100644
+--- a/memops.h
++++ b/memops.h
+@@ -39,11 +39,17 @@ extern "C" {
+ #endif
+ 
+ /* Name mangling */
++#define cnd_memcpy nettle_cnd_memcpy
+ #define memeql_sec nettle_memeql_sec
+ 
+ int
+ memeql_sec (const void *a, const void *b, size_t n);
+ 
++/* Side-channel silent conditional memcpy. cnd must be 0 (nop) or 1
++   (copy). */
++void
++cnd_memcpy(int cnd, volatile void *dst, const volatile void *src, size_t n);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/testsuite/.test-rules.make b/testsuite/.test-rules.make
+index 12c39f3..2023e06 100644
+--- a/testsuite/.test-rules.make
++++ b/testsuite/.test-rules.make
+@@ -25,6 +25,9 @@ camellia-test$(EXEEXT): camellia-test.$(OBJEXT)
+ chacha-test$(EXEEXT): chacha-test.$(OBJEXT)
+ 	$(LINK) chacha-test.$(OBJEXT) $(TEST_OBJS) -o chacha-test$(EXEEXT)
+ 
++cnd-memcpy-test$(EXEEXT): cnd-memcpy-test.$(OBJEXT)
++	$(LINK) cnd-memcpy-test.$(OBJEXT) $(TEST_OBJS) -o cnd-memcpy-test$(EXEEXT)
++
+ des-test$(EXEEXT): des-test.$(OBJEXT)
+ 	$(LINK) des-test.$(OBJEXT) $(TEST_OBJS) -o des-test$(EXEEXT)
+ 
+diff --git a/testsuite/Makefile.in b/testsuite/Makefile.in
+index df1c815..9a7f6a2 100644
+--- a/testsuite/Makefile.in
++++ b/testsuite/Makefile.in
+@@ -14,6 +14,7 @@ TS_NETTLE_SOURCES = aes-test.c arcfour-test.c arctwo-test.c \
+ 		    blowfish-test.c cast128-test.c \
+ 	            base16-test.c base64-test.c \
+ 		    camellia-test.c chacha-test.c \
++		    cnd-memcpy-test.c \
+ 		    des-test.c des3-test.c des-compat-test.c \
+ 		    md2-test.c md4-test.c md5-test.c md5-compat-test.c \
+ 		    memeql-test.c memxor-test.c gosthash94-test.c \
+diff --git a/testsuite/cnd-memcpy-test.c b/testsuite/cnd-memcpy-test.c
+new file mode 100644
+index 0000000..6e5db34
+--- /dev/null
++++ b/testsuite/cnd-memcpy-test.c
+@@ -0,0 +1,47 @@
++#include "testutils.h"
++#include "knuth-lfib.h"
++#include "memops.h"
++
++#if HAVE_VALGRIND_MEMCHECK_H
++# include <valgrind/memcheck.h>
++static void
++cnd_memcpy_for_test(int cnd, void *dst, const void *src, size_t n)
++{
++  /* Makes valgrind trigger on any branches depending on the input
++     data. */
++  VALGRIND_MAKE_MEM_UNDEFINED (dst, n);
++  VALGRIND_MAKE_MEM_UNDEFINED (src, n);
++  VALGRIND_MAKE_MEM_UNDEFINED (&cnd, sizeof(cnd));
++
++  cnd_memcpy (cnd, dst, src, n);
++  VALGRIND_MAKE_MEM_DEFINED (src, n);
++  VALGRIND_MAKE_MEM_DEFINED (dst, n);
++}
++#else
++#define cnd_memcpy_for_test cnd_memcpy
++#endif
++
++#define MAX_SIZE 50
++void
++test_main(void)
++{
++  uint8_t src[MAX_SIZE];
++  uint8_t dst[MAX_SIZE];
++  uint8_t res[MAX_SIZE];
++  struct knuth_lfib_ctx random_ctx;
++
++  knuth_lfib_init (&random_ctx, 11);
++
++  size_t size;
++  for (size = 1; size < 50; size++)
++    {
++      knuth_lfib_random (&random_ctx, size, src);
++      knuth_lfib_random (&random_ctx, size, dst);
++      memcpy (res, dst, size);
++      cnd_memcpy_for_test (0, res, src, size);
++
++      ASSERT (memcmp (res, dst, size) == 0);
++      cnd_memcpy_for_test (1, res, src, size);
++      ASSERT (memcmp (res, src, size) == 0);
++    }
++}
+-- 
+1.7.9.5
+

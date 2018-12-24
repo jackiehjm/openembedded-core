@@ -1,0 +1,29 @@
+From 98e309bef52ff325b67d5aa083dd384eace426fa Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Thu, 8 Nov 2018 14:47:13 -0500
+Subject: [PATCH] Add convenience macro for size calculation
+
+Returns number of limbs needed to contain N bytes long number.
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ gmp-glue.h |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gmp-glue.h b/gmp-glue.h
+index 648724b..38cdd19 100644
+--- a/gmp-glue.h
++++ b/gmp-glue.h
+@@ -81,6 +81,9 @@
+ # define cnd_sub_n(cnd, rp, ap, n) mpn_submul_1 ((rp), (ap), (n), (cnd) != 0)
+ #endif
+ 
++#define NETTLE_OCTET_SIZE_TO_LIMB_SIZE(n) \
++  (((n) * 8 + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
++
+ /* Some functions for interfacing between mpz and mpn code. Signs of
+    the mpz numbers are generally ignored. */
+ 
+-- 
+1.7.9.5
+
