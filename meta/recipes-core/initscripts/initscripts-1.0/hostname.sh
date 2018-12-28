@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 39 61
 ### BEGIN INIT INFO
 # Provides:          hostname
 # Required-Start:

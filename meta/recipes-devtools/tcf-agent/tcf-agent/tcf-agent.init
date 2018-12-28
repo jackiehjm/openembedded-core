@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 35 99 20
 ### BEGIN INIT INFO
 # Provides:          tcf-agent
 # Default-Start:     3 5

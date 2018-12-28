@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 06S 38 62
 ### BEGIN INIT INFO
 # Provides:          urandom
 # Required-Start:    $local_fs mountvirtfs

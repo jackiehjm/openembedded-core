@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 36 64
 ### BEGIN INIT INFO
 # Provides:          bootmisc
 # Required-Start:    $local_fs mountvirtfs

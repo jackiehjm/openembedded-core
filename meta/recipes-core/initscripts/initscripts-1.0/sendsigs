@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 06 20 80
 ### BEGIN INIT INFO
 # Provides:          sendsigs
 # Required-Start:    

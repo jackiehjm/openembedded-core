@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 06 25 75
 ### BEGIN INIT INFO
 # Provides:          save-rtc
 # Required-Start:

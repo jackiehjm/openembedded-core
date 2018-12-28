@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 38 62
 ### BEGIN INIT INFO
 # Provides:             dmesg
 # Required-Start:

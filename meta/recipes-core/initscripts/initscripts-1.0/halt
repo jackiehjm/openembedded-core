@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 0 90 10
 ### BEGIN INIT INFO
 # Provides:          halt
 # Required-Start:

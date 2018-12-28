@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 99 1
 ### BEGIN INIT INFO
 # Provides:          rmnologin
 # Required-Start:    $remote_fs $all

@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 06 94
 ### BEGIN INIT INFO
 # Provides:          devpts
 # Required-Start: udev

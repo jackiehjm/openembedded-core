@@ -1,4 +1,5 @@
 #! /bin/sh
+# chkconfig: S 07 93
 ### BEGIN INIT INFO
 # Provides:          bootlogd
 # Required-Start:

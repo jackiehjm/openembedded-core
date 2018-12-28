@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 19 21
 ### BEGIN INIT INFO
 # Provides:          nfs-common
 # Required-Start:    $portmap hwclock

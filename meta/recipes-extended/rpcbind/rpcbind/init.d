@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 12 60
 #
 # start/stop rpcbind daemon.
 

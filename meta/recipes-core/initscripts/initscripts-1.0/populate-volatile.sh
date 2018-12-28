@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 37 63
 ### BEGIN INIT INFO
 # Provides:             volatile
 # Required-Start:       $local_fs

@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 20 20
 ### BEGIN INIT INFO
 # Provides:          hwclock
 # Required-Start:    

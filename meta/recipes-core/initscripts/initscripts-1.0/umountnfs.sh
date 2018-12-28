@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 016 31 69
 ### BEGIN INIT INFO
 # Provides:          umountnfs
 # Required-Start:

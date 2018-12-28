@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 05 95
 ### BEGIN INIT INFO
 # Provides:          module-init-tools
 # Required-Start:    

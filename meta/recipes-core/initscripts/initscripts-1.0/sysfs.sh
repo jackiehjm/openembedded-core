@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 02 98
 ### BEGIN INIT INFO
 # Provides:          mountvirtfs
 # Required-Start:

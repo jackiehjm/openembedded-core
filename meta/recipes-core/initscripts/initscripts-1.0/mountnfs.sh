@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 15 85
 ### BEGIN INIT INFO
 # Provides:          mountnfs
 # Required-Start:    $local_fs $network $rpcbind

@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 03 97
 ### BEGIN INIT INFO
 # Provides:          mountall
 # Required-Start:    mountvirtfs

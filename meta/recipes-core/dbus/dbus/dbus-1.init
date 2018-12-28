@@ -1,4 +1,5 @@
 #! /bin/sh
+# chkconfig: 235 02 20
 ### BEGIN INIT INFO
 # Provides:          dbus
 # Required-Start:    $remote_fs $syslog

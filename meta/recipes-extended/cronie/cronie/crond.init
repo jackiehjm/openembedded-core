@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 2345 90 60
 ### BEGIN INIT INFO
 # Provides: crond crontab
 # Default-Start:  2345

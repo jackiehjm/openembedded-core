@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 12345 25 85
 #/etc/init.d/watchdog: start watchdog daemon.
 
 ### BEGIN INIT INFO

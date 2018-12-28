@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: S 04 96
 
 ### BEGIN INIT INFO
 # Provides:          udev
