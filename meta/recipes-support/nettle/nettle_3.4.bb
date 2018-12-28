@@ -45,6 +45,8 @@ EXTRA_AUTORECONF += "--exclude=aclocal"
 
 EXTRA_OECONF = "--disable-openssl"
 
+CFLAGS_append = " -std=c99"
+
 do_compile_ptest() {
         oe_runmake buildtest
 }
