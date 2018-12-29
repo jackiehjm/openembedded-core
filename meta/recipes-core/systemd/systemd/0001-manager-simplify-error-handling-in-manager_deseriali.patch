@@ -1,0 +1,158 @@
+From 05067c3c1f6909e5fac81e758aaf9d1dfd0ae0c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 10 Oct 2018 13:54:13 +0200
+Subject: [PATCH] manager: simplify error handling in manager_deserialize()
+
+If a memory error occurred, we would still go through the path which sets the
+error on ferror(). It is unlikely that ferror() returns true, but it's seems
+cleaner to just propagate the error we already have.
+
+The handling of fgets() returning NULL is also simplified: according to the man
+page, it returns NULL only on EOF or error. So if feof() returns true, I don't
+think we should call ferror() again.
+
+While at it, let's set errno to 0 and check that it is set before returning it
+as an error. The man pages for fgets() and feof() do not say anything about
+setting errno.
+---
+ src/core/manager.c |   51 +++++++++++++++++----------------------------------
+ 1 file changed, 17 insertions(+), 34 deletions(-)
+
+diff --git a/src/core/manager.c b/src/core/manager.c
+index da94343..6e29ddd 100644
+--- a/src/core/manager.c
++++ b/src/core/manager.c
+@@ -3133,13 +3133,13 @@ int manager_deserialize(Manager *m, FILE
+                 char line[LINE_MAX];
+                 const char *val, *l;
+ 
++                errno = 0;
+                 if (!fgets(line, sizeof(line), f)) {
+-                        if (feof(f))
+-                                r = 0;
+-                        else
+-                                r = -errno;
+-
+-                        goto finish;
++                        assert(m->n_reloading > 0);
++                        m->n_reloading--;
++                        if (!feof(f)) {
++                                return -errno ?: -EIO;
++                        return 0;
+                 }
+ 
+                 char_array_0(line);
+@@ -3228,8 +3228,11 @@ int manager_deserialize(Manager *m, FILE
+ 
+                 } else if (startswith(l, "env=")) {
+                         r = deserialize_environment(&m->environment, l);
+-                        if (r == -ENOMEM)
+-                                goto finish;
++                        if (r == -ENOMEM) {
++                                assert(m->n_reloading > 0);
++                                m->n_reloading--;
++                                return r;
++                        }
+                         if (r < 0)
+                                 log_notice_errno(r, "Failed to parse environment entry: \"%s\": %m", l);
+ 
+@@ -3245,17 +3248,13 @@ int manager_deserialize(Manager *m, FILE
+                         }
+ 
+                 } else if ((val = startswith(l, "notify-socket="))) {
+-                        char *n;
+-
+-                        n = strdup(val);
+-                        if (!n) {
+-                                r = -ENOMEM;
+-                                goto finish;
++                        r = free_and_strdup(&m->notify_socket, val);
++                        if (r < 0) {
++                                assert(m->n_reloading > 0);
++                                m->n_reloading--;
++                                return r;
+                         }
+ 
+-                        free(m->notify_socket);
+-                        m->notify_socket = n;
+-
+                 } else if ((val = startswith(l, "cgroups-agent-fd="))) {
+                         int fd;
+ 
+@@ -3290,8 +3289,9 @@ int manager_deserialize(Manager *m, FILE
+                 else if ((val = startswith(l, "subscribed="))) {
+ 
+                         if (strv_extend(&m->deserialized_subscribed, val) < 0) {
+-                                r = -ENOMEM;
+-                                goto finish;
++                                assert(m->n_reloading > 0);
++                                m->n_reloading--;
++                                return -ENOMEM;
+                         }
+ 
+                 } else {
+@@ -3320,13 +3320,13 @@ int manager_deserialize(Manager *m, FILE
+                 const char* unit_name;
+ 
+                 /* Start marker */
++                errno = 0;
+                 if (!fgets(name, sizeof(name), f)) {
+-                        if (feof(f))
+-                                r = 0;
+-                        else
+-                                r = -errno;
+-
+-                        goto finish;
++		        assert(m->n_reloading > 0);
++       			m->n_reloading--;
++                        if (!feof(f))
++                                return -errno ?: -EIO;
++                        return 0;
+                 }
+ 
+                 char_array_0(name);
+@@ -3334,8 +3334,11 @@ int manager_deserialize(Manager *m, FILE
+ 
+                 r = manager_load_unit(m, unit_name, NULL, NULL, &u);
+                 if (r < 0) {
+-                        if (r == -ENOMEM)
+-                                goto finish;
++                        if (r == -ENOMEM) {
++			        assert(m->n_reloading > 0);
++        			m->n_reloading--;
++                                return r;
++			}
+ 
+                         log_notice_errno(r, "Failed to load unit \"%s\", skipping deserialization: %m", unit_name);
+                         unit_deserialize_skip(f);
+@@ -3344,21 +3347,20 @@ int manager_deserialize(Manager *m, FILE
+ 
+                 r = unit_deserialize(u, f, fds);
+                 if (r < 0) {
+-                        if (r == -ENOMEM)
+-                                goto finish;
++                        if (r == -ENOMEM){
++			        assert(m->n_reloading > 0);
++        			m->n_reloading--;
++                                return r;
++			}
+ 
+                         log_notice_errno(r, "Failed to deserialize unit \"%s\": %m", unit_name);
+                 }
+         }
+ 
+-finish:
+-        if (ferror(f))
+-                r = -EIO;
+-
+         assert(m->n_reloading > 0);
+         m->n_reloading--;
+ 
+-        return r;
++        return 0;
+ }
+ 
+ static void manager_flush_finished_jobs(Manager *m) {
+-- 
+1.7.9.5
+

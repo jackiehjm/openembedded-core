@@ -56,6 +56,10 @@ SRC_URI_MUSL = "file://0001-Use-getenv-when-secure-versions-are-not-available.pa
                file://0020-distinguish-XSI-compliant-strerror_r-from-GNU-specif.patch \
                file://0021-Hide-__start_BUS_ERROR_MAP-and-__stop_BUS_ERROR_MAP.patch \
                file://CVE-2018-15687.patch \
+               file://0001-core-handle-OOM-during-deserialization-always-the-sa.patch \
+               file://0001-manager-simplify-error-handling-in-manager_deseriali.patch \
+               file://CVE-2018-15686.patch \
+               file://CVE-2018-15688.patch \
                "
 
 # Workaround undefined reference to `__stack_chk_fail_local' on qemux86 and qemuppc for musl
