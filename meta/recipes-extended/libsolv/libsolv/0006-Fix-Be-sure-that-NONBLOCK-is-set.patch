@@ -1,0 +1,29 @@
+From bbfce7d10015fd7f72bcd5dbbca6c30f02cd7f4d Mon Sep 17 00:00:00 2001
+From: Jaroslav Rohel <jrohel@redhat.com>
+Date: Tue, 11 Dec 2018 12:40:42 +0100
+Subject: [PATCH 6/7] Fix: Be sure that NONBLOCK is set
+
+---
+ examples/solv/fastestmirror.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/examples/solv/fastestmirror.c b/examples/solv/fastestmirror.c
+index d2ebd97..0ee4e73 100644
+--- a/examples/solv/fastestmirror.c
++++ b/examples/solv/fastestmirror.c
+@@ -68,7 +68,11 @@ findfastest(char **urls, int nurls)
+ 	  socks[i] = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+ 	  if (socks[i] >= 0)
+ 	    {
+-	      fcntl(socks[i], F_SETFL, O_NONBLOCK);
++	      if (fcntl(socks[i], F_SETFL, O_NONBLOCK) == -1)
++            {
++		      close(socks[i]);
++		      socks[i] = -1;
++            }
+ 	      if (connect(socks[i], result->ai_addr, result->ai_addrlen) == -1)
+ 		{
+ 		  if (errno != EINPROGRESS)
+-- 
+1.7.9.5
+

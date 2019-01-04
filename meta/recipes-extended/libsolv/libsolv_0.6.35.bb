@@ -7,7 +7,16 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=62272bd11c97396d4aaf1c41bc11f7d8"
 
 DEPENDS = "expat zlib"
 
-SRC_URI = "git://github.com/openSUSE/libsolv.git"
+SRC_URI = "git://github.com/openSUSE/libsolv.git \
+           file://0001-Fix-Dereference-of-null-pointer.patch \
+           file://0002-Fix-Add-va_end-before-return.patch \
+           file://0003-Fix-Memory-leaks.patch \
+           file://0004-Fix-testsolv-segfault.patch \
+           file://0005-Fix-testsolv-segfaults.patch \
+           file://0006-Fix-Be-sure-that-NONBLOCK-is-set.patch \
+           file://0007-Don-t-set-values-that-are-never-read.patch \
+"
+
 SRC_URI_append_libc-musl = " file://0001-Add-fallback-fopencookie-implementation.patch \
                              file://0002-Fixes-to-internal-fopencookie-implementation.patch \
                            "

@@ -1,0 +1,25 @@
+From c5883b20b7b021ee94111cb72777ab3ba3f50950 Mon Sep 17 00:00:00 2001
+From: Jaroslav Rohel <jrohel@redhat.com>
+Date: Fri, 7 Dec 2018 07:05:10 +0100
+Subject: [PATCH 1/7] Fix: Dereference of null pointer
+
+---
+ ext/repo_repomdxml.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/repo_repomdxml.c b/ext/repo_repomdxml.c
+index fd46272..46d8361 100644
+--- a/ext/repo_repomdxml.c
++++ b/ext/repo_repomdxml.c
+@@ -181,7 +181,7 @@ startElement(struct solv_xmlparser *xmlp, int state, const char *name, const cha
+             while (value)
+ 	      {
+ 		char *p = strchr(value, ',');
+-		if (*p)
++		if (p)
+ 		  *p++ = 0;
+ 		if (*value)
+ 		  repodata_add_poolstr_array(pd->data, SOLVID_META, REPOSITORY_UPDATES, value);
+-- 
+1.7.9.5
+
