@@ -25,6 +25,12 @@ SRC_URI = "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/${VERSIO
            file://nss-fix-nsinstall-build.patch \
            file://disable-Wvarargs-with-clang.patch \
            file://pqg.c-ULL_addend.patch \
+           file://CVE-2018-12384.patch \
+           file://CVE-2018-12384-2.patch \
+           file://CVE-2018-12384-3.patch \
+           file://CVE-2018-12404.patch \
+           file://CVE-2018-12404-2.patch \
+           file://CVE-2018-12404-3.patch \
            file://blank-cert9.db \
            file://blank-key4.db \
            file://system-pkcs11.txt \
