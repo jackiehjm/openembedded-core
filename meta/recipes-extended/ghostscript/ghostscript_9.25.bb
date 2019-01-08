@@ -32,6 +32,8 @@ SRC_URI = "${SRC_URI_BASE} \
            file://ghostscript-9.02-genarch.patch \
            file://objarch.h \
            file://cups-no-gcrypt.patch \
+           file://CVE-2018-19134.patch \
+           file://CVE-2018-19478.patch \
            "
 
 SRC_URI_class-native = "${SRC_URI_BASE} \
