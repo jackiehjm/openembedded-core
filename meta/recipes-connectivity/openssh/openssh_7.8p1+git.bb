@@ -25,6 +25,7 @@ SRC_URI = "git://github.com/openssh/openssh-portable;branch=master \
            file://sshd_check_keys \
            file://add-test-support-for-busybox.patch \
            file://0001-Restore-TCP-wrappers-support.patch \
+           file://CVE-2018-20685.patch \
            "
 
 PAM_SRC_URI = "file://sshd"
