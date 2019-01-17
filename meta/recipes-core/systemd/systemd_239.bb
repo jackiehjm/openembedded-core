@@ -60,6 +60,12 @@ SRC_URI_MUSL = "file://0001-Use-getenv-when-secure-versions-are-not-available.pa
                file://0001-manager-simplify-error-handling-in-manager_deseriali.patch \
                file://CVE-2018-15686.patch \
                file://CVE-2018-15688.patch \
+               file://CVE-2018-16864.patch \
+               file://CVE-2018-16865.patch \
+               file://0001-journal-remote-verify-entry-length-from-header.patch \
+               file://CVE-2018-16865-2.patch \
+               file://CVE-2018-16866.patch \
+               file://CVE-2018-16866-2.patch \
                "
 
 # Workaround undefined reference to `__stack_chk_fail_local' on qemux86 and qemuppc for musl
