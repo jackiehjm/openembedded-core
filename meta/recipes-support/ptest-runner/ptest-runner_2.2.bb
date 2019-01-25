@@ -10,12 +10,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "49956f65bb53ea2a2c1b394e5e59ffdfcdcc490f"
 PV = "2.2+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/ptest-runner2"
+SRC_URI = "git://git.yoctoproject.org/ptest-runner2 \
+           file://0001-ptest-runner-make-DEFAULT_DIRECTORY-be-able-to-be-de.patch "
 S = "${WORKDIR}/git"
 
 FILES_${PN} = "${bindir}/ptest-runner"
 
-EXTRA_OEMAKE = "-e MAKEFLAGS="
+EXTRA_OEMAKE = "-e MAKEFLAGS= CFLAGS="${CFLAGS} -DDEFAULT_DIRECTORY=\\\"${libdir}\\\"""
 
 do_compile () {
 	oe_runmake

@@ -1,0 +1,41 @@
+From e1062f776eea60c50435c6b8ddf9714a31141aee Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Mon, 21 Jan 2019 10:11:36 +0800
+Subject: [PATCH] ptest-runner: make DEFAULT_DIRECTORY be able to be defined
+ when compiling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In yocto project ptest data are installed to
+PTEST_PATH ?= "${libdir}/${BPN}/ptest". Here make DEFAULT_DIRECTORY
+be able to be defined outside of c code (e.g. passed in by CFLAGS),
+in case libdir isn't "/usr/lib", which will cause "No ptests found"
+error when running "ptest-runner" command. We will pass libdir to
+DEFAULT_DIRECTORY when compiling to avoid that error.
+
+Upstream-Status: Backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
+---
+ main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/main.c b/main.c
+index 83600b7..e963efe 100644
+--- a/main.c
++++ b/main.c
+@@ -37,7 +37,9 @@
+ 
+ #include "utils.h"
+ 
++#ifndef DEFAULT_DIRECTORY
+ #define DEFAULT_DIRECTORY "/usr/lib"
++#endif
+ #define DEFAULT_TIMEOUT 300
+ 
+ static inline void
+-- 
+1.9.1
+
