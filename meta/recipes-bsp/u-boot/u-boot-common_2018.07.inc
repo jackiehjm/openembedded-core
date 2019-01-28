@@ -15,6 +15,7 @@ SRC_URI = "git://git.denx.de/u-boot.git \
            file://CVE-2018-1000205-2.patch \
            file://CVE-2018-18440-1.patch \
            file://CVE-2018-18440-2.patch \
+           file://CVE-2018-18439.patch \
 "
 
 S = "${WORKDIR}/git"
