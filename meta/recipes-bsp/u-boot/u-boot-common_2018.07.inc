@@ -13,6 +13,17 @@ SRCREV = "8c5d4fd0ec222701598a27b26ab7265d4cee45a3"
 SRC_URI = "git://git.denx.de/u-boot.git \
            file://CVE-2018-1000205-1.patch \
            file://CVE-2018-1000205-2.patch \
+           file://CVE-2018-18439-18440-1.patch \
+           file://CVE-2018-18439-18440-2.patch \
+           file://CVE-2018-18439-18440-3.patch \
+           file://CVE-2018-18439-18440-4.patch \
+           file://CVE-2018-18439-18440-5.patch \
+           file://CVE-2018-18439-18440-6.patch \
+           file://CVE-2018-18439-18440-7.patch \
+           file://CVE-2018-18439-18440-8.patch \
+           file://CVE-2018-18439-18440-9.patch \
+           file://CVE-2018-18439-18440-10.patch \
+           file://CVE-2018-18439-18440-11.patch \
 "
 
 S = "${WORKDIR}/git"
