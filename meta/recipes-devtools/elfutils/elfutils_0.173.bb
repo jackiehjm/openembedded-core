@@ -31,6 +31,10 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://CVE-2018-16062.patch \
            file://0001-libdw-Check-end-of-attributes-list-consistently.patch \
            file://0002-libelf-Return-error-if-elf_compress_gnu-is-used-on-S.patch \
+           file://CVE-2019-7148.patch \
+           file://CVE-2019-7149.patch \
+           file://CVE-2019-7150.patch \
+           file://CVE-2019-7665.patch \
            "
 SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch"
 
