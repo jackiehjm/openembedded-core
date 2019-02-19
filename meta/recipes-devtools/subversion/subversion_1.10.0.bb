@@ -11,6 +11,7 @@ SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://disable_macos.patch \
            file://0001-Fix-libtool-name-in-configure.ac.patch \
            file://serfmacro.patch \
+           file://subversion-CVE-2018-11803.patch \
            "
 
 SRC_URI[md5sum] = "0126847f9e8cb8ed0b90a6a18b203309"
