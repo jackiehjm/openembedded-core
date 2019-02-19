@@ -1,8 +1,7 @@
-From 79e53510b1f9e16a21db312698fb1c1c442481e7 Mon Sep 17 00:00:00 2001
+From 77970543b18755ded1d42938fc3de37a4b0e587f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:27:17 +0000
-Subject: [PATCH 05/15] Only generate an RPATH entry if LD_RUN_PATH is not
- empty
+Subject: [PATCH] Only generate an RPATH entry if LD_RUN_PATH is not empty
 
 for cases where -rpath isn't specified. debian (#151024)
 
@@ -10,6 +9,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Chris Chimelis <chris@debian.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  ld/emultempl/elf32.em | 4 ++++
  1 file changed, 4 insertions(+)
@@ -36,6 +36,3 @@ index 1ad9d6b6fa..6a025a45b4 100644
  
    for (abfd = link_info.input_bfds; abfd; abfd = abfd->link.next)
      if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
--- 
-2.18.0
-

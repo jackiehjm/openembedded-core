@@ -10,10 +10,10 @@ over.
  1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/src/core/manager.c b/src/core/manager.c
-index e1568e7..48fca62 100644
+index 54382077c8..40bdc6fa75 100644
 --- a/src/core/manager.c
 +++ b/src/core/manager.c
-@@ -3289,8 +3289,11 @@ int manager_deserialize(Manager *m, FILE
+@@ -3286,8 +3286,11 @@ int manager_deserialize(Manager *m, FILE *f, FDSet *fds) {
                          exec_runtime_deserialize_one(m, val, fds);
                  else if ((val = startswith(l, "subscribed="))) {
  
@@ -27,18 +27,20 @@ index e1568e7..48fca62 100644
                  } else {
                          ManagerTimestamp q;
  
-@@ -3331,18 +3334,20 @@ int manager_deserialize(Manager *m, FILE
+@@ -3326,10 +3329,11 @@ int manager_deserialize(Manager *m, FILE *f, FDSet *fds) {
  
                  r = manager_load_unit(m, unit_name, NULL, NULL, &u);
                  if (r < 0) {
 -                        log_notice_errno(r, "Failed to load unit \"%s\", skipping deserialization: %m", unit_name);
                          if (r == -ENOMEM)
                                  goto finish;
-+
+ 
 +                        log_notice_errno(r, "Failed to load unit \"%s\", skipping deserialization: %m", unit_name);
-                         unit_deserialize_skip(f);
-                         continue;
-                 }
++
+                         r = unit_deserialize_skip(f);
+                         if (r < 0)
+                                 goto finish;
+@@ -3339,9 +3343,10 @@ int manager_deserialize(Manager *m, FILE *f, FDSet *fds) {
  
                  r = unit_deserialize(u, f, fds);
                  if (r < 0) {
@@ -50,6 +52,3 @@ index e1568e7..48fca62 100644
                  }
          }
  
--- 
-1.7.9.5
-

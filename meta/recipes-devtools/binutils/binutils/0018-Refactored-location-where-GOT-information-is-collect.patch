@@ -1,4 +1,4 @@
-From d930affa2d475d1cc6792f1e6d56bef3d6c617db Mon Sep 17 00:00:00 2001
+From 56bfcde1c065775d9cb9aed0150d3f90268d846e Mon Sep 17 00:00:00 2001
 From: Cupertino Miranda <cmiranda@synopsys.com>
 Date: Fri, 2 Mar 2018 17:16:21 +0100
 Subject: [PATCH] Refactored location where GOT information is collected.
@@ -21,13 +21,14 @@ Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
 Signed-off-by: Romain Naour <romain.naour@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  bfd/arc-got.h   |  6 +++--
  bfd/elf32-arc.c | 77 +++++++++++++++++++++++++++++++--------------------------
  2 files changed, 46 insertions(+), 37 deletions(-)
 
 diff --git a/bfd/arc-got.h b/bfd/arc-got.h
-index a86061bcb38..81ce88fe21a 100644
+index a86061bcb3..81ce88fe21 100644
 --- a/bfd/arc-got.h
 +++ b/bfd/arc-got.h
 @@ -156,9 +156,11 @@ get_got_entry_list_for_symbol (bfd *abfd,
@@ -45,7 +46,7 @@ index a86061bcb38..81ce88fe21a 100644
    else
      {
 diff --git a/bfd/elf32-arc.c b/bfd/elf32-arc.c
-index a48ef0ca15f..ab84de43815 100644
+index a48ef0ca15..ab84de4381 100644
 --- a/bfd/elf32-arc.c
 +++ b/bfd/elf32-arc.c
 @@ -160,6 +160,18 @@ struct arc_relocation_data
@@ -196,6 +197,3 @@ index a48ef0ca15f..ab84de43815 100644
  				     output_bfd,
  				     info,
  				     h);
--- 
-2.14.4
-

@@ -10,10 +10,15 @@ Add GOBUILDMODE to support it which make PIE executables the default
 build mode, as PIE executables are required as of Yocto
 
 Refers: https://groups.google.com/forum/#!topic/golang-dev/gRCe5URKewI
+<<<<<<< HEAD
 Upstream-Status: Denied
 Denied due to upstream choosing another solution: `17a256b cmd/go:
 -buildmode=pie for android/arm'
 
+=======
+Upstream-Status: Denied [upstream choose antoher solution: `17a256b
+cmd/go: -buildmode=pie for android/arm']
+>>>>>>> base/wr-10.18-20190214
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---

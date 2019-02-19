@@ -1,7 +1,7 @@
-From 9e1d8f9a657a8bd48048c2ea6407cf60b723bd68 Mon Sep 17 00:00:00 2001
+From f81d72125cf2c2c077d743ab047ed7ac7da7292d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
-Subject: [PATCH 10/15] Fix rpath in libtool when sysroot is enabled
+Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
 
 Enabling sysroot support in libtool exposed a bug where the final
 library had an RPATH encoded into it which still pointed to the
@@ -14,6 +14,7 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  ltmain.sh | 10 ++++++++--
  1 file changed, 8 insertions(+), 2 deletions(-)
@@ -47,6 +48,3 @@ index 70e856e065..11ee684ccc 100644
  	  if test -n "$hardcode_libdir_separator"; then
  	    if test -z "$hardcode_libdirs"; then
  	      hardcode_libdirs="$libdir"
--- 
-2.18.0
-

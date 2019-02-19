@@ -1,4 +1,8 @@
-binutils : enable x86_64-pep for producing EFI binaries on x86-64
+From 3cfd279b3808289e880ee148e4f4e805122d14e0 Mon Sep 17 00:00:00 2001
+From: Christopher Clark <christopher.clark6@baesystems.com>
+Date: Mon, 30 Jul 2018 00:55:21 -0700
+Subject: [PATCH] binutils : enable x86_64-pep for producing EFI binaries on
+ x86-64
 
 Add x86_64-pep emulation support to the set enabled for x86_64 targets
 to enable the linker to produce Portable Executables for EFI binaries.
@@ -9,9 +13,14 @@ the OpenXT Project.
 Signed-off-by: Christopher Clark <christopher.clark6@baesystems.com>
 
 Upstream-Status: Inappropriate [OE configuration specific]
+
 ---
+ bfd/config.bfd   | 2 +-
+ ld/configure.tgt | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index c882421..dc705b6 100644
+index c882421343..dc705b6e87 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
 @@ -688,7 +688,7 @@ case "${targ}" in
@@ -24,7 +33,7 @@ index c882421..dc705b6 100644
      ;;
    x86_64-*-nacl*)
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index a1db7ad..65a984a 100644
+index a1db7adfe2..65a984a47d 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
 @@ -253,8 +253,9 @@ x86_64-*-linux-gnux32)	targ_emul=elf32_x86_64

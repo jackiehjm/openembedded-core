@@ -1,4 +1,4 @@
-From 2a50366ded329bfb39d387253450c9d5302c3503 Mon Sep 17 00:00:00 2001
+From 4b81d996b7a333863d1491e2296514bb62b06fb0 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 14 Aug 2018 12:22:35 +0100
 Subject: [PATCH] as.c: Improve check for input file matching output file.
@@ -11,15 +11,16 @@ systems.
 Upstream-Status: Backport
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
 ---
- gas/as.c      | 27 ++++++++++++++++++++-------
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ gas/as.c | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
 diff --git a/gas/as.c b/gas/as.c
-index b2a908a..3105d06 100644
+index 02c7d2970b..919c24a24a 100644
 --- a/gas/as.c
 +++ b/gas/as.c
-@@ -1259,14 +1259,27 @@ main (int argc, char ** argv)
+@@ -1254,14 +1254,27 @@ main (int argc, char ** argv)
  	{
  	  struct stat sib;
  
@@ -54,6 +55,3 @@ index b2a908a..3105d06 100644
  	    }
  	}
      }
--- 
-2.7.4
-

@@ -1,4 +1,4 @@
-From 9d09ce14b4eef2b56f24660fd69a44acd45128b2 Mon Sep 17 00:00:00 2001
+From b00ab0fdfd648a3c9ead4b943f4bcece2e0096d2 Mon Sep 17 00:00:00 2001
 From: Cupertino Miranda <cmiranda@synopsys.com>
 Date: Fri, 2 Mar 2018 17:38:14 +0100
 Subject: [PATCH] Make sure global symbol is not an indirect or warning.
@@ -19,12 +19,13 @@ Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
 Signed-off-by: Romain Naour <romain.naour@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  bfd/elf32-arc.c | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/bfd/elf32-arc.c b/bfd/elf32-arc.c
-index 33fc72cff6e..9b72c5b4f4f 100644
+index 33fc72cff6..9b72c5b4f4 100644
 --- a/bfd/elf32-arc.c
 +++ b/bfd/elf32-arc.c
 @@ -1960,7 +1960,12 @@ elf_arc_check_relocs (bfd *			 abfd,
@@ -41,6 +42,3 @@ index 33fc72cff6e..9b72c5b4f4f 100644
  
  
        switch (r_type)
--- 
-2.14.4
-

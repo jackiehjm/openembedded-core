@@ -23,9 +23,6 @@
 #    COPYLEFT_RECIPE_TYPES = 'target'
 #
 
-# Don't filter the license by default
-COPYLEFT_LICENSE_INCLUDE ?= ''
-COPYLEFT_LICENSE_EXCLUDE ?= ''
 # Create archive for all the recipe types
 COPYLEFT_RECIPE_TYPES ?= 'target native nativesdk cross crosssdk cross-canadian'
 inherit copyleft_filter
@@ -275,6 +272,14 @@ python do_ar_configured() {
         create_tarball(d, srcdir, 'configured', ar_outdir)
 }
 
+def exclude_useless_paths(tarinfo):
+    if tarinfo.isdir():
+        if tarinfo.name.endswith('/temp') or tarinfo.name.endswith('/patches') or tarinfo.name.endswith('/.pc'):
+            return None
+        elif tarinfo.name == 'temp' or tarinfo.name == 'patches' or tarinfo.name == '.pc':
+            return None
+    return tarinfo
+
 def create_tarball(d, srcdir, suffix, ar_outdir):
     """
     create the tarball from srcdir
@@ -299,7 +304,7 @@ def create_tarball(d, srcdir, suffix, ar_outdir):
 
     bb.note('Creating %s' % tarname)
     tar = tarfile.open(tarname, 'w:gz')
-    tar.add(srcdir, arcname=os.path.basename(srcdir))
+    tar.add(srcdir, arcname=os.path.basename(srcdir), filter=exclude_useless_paths)
     tar.close()
 
 # creating .diff.gz between source.orig and source

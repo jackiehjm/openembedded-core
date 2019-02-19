@@ -1,7 +1,7 @@
-From 9af90cfc35ff1fe78755578861473039836c467a Mon Sep 17 00:00:00 2001
+From 7afea8ab254db90d07ae48b56c5e534379193d69 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 31 Mar 2017 11:42:03 -0700
-Subject: [PATCH 14/15] Detect 64-bit MIPS targets
+Subject: [PATCH] Detect 64-bit MIPS targets
 
 Add mips64 target triplets and default to N64
 
@@ -9,6 +9,7 @@ Upstream-Status: Submitted
 https://sourceware.org/ml/binutils/2016-08/msg00048.html
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  gold/configure.tgt | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
@@ -45,6 +46,3 @@ index 8aef22a318..7030026ffa 100644
  mips*-*-*)
   targ_obj=mips
   targ_machine=EM_MIPS
--- 
-2.18.0
-

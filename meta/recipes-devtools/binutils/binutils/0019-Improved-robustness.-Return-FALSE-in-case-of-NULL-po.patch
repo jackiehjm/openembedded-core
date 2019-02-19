@@ -1,4 +1,4 @@
-From 955176bd999fe80c5b937ab8786665079e35c387 Mon Sep 17 00:00:00 2001
+From 3c8c811d76837ef7052087a3f09e600b2c59603d Mon Sep 17 00:00:00 2001
 From: Cupertino Miranda <cmiranda@synopsys.com>
 Date: Fri, 2 Mar 2018 17:33:48 +0100
 Subject: [PATCH] Improved robustness. Return FALSE in case of NULL pointer.
@@ -15,12 +15,13 @@ Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
 Signed-off-by: Romain Naour <romain.naour@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  bfd/elf32-arc.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/bfd/elf32-arc.c b/bfd/elf32-arc.c
-index ab84de43815..33fc72cff6e 100644
+index ab84de4381..33fc72cff6 100644
 --- a/bfd/elf32-arc.c
 +++ b/bfd/elf32-arc.c
 @@ -2420,6 +2420,9 @@ elf_arc_finish_dynamic_symbol (bfd * output_bfd,
@@ -33,6 +34,3 @@ index ab84de43815..33fc72cff6e 100644
        if (h->dynindx == -1
  	  || (h->root.type != bfd_link_hash_defined
  	      && h->root.type != bfd_link_hash_defweak)
--- 
-2.14.4
-
