@@ -25,6 +25,13 @@ SRC_URI_BASE = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/d
                 file://do-not-check-local-libpng-source.patch \
                 file://avoid-host-contamination.patch \
                 file://mkdir-p.patch \
+                file://CVE-2019-6116-0001.patch \
+                file://CVE-2019-6116-0002.patch \
+                file://CVE-2019-6116-0003.patch \
+                file://CVE-2019-6116-0004.patch \
+                file://CVE-2019-6116-0005.patch \
+                file://CVE-2019-6116-0006.patch \
+                file://CVE-2019-6116-0007.patch \
 "
 
 SRC_URI = "${SRC_URI_BASE} \
