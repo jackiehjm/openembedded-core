@@ -38,6 +38,8 @@ SRC_URI = "http://libarchive.org/downloads/libarchive-${PV}.tar.gz \
            file://CVE-2018-1000878.patch \
            file://CVE-2018-1000879.patch \
            file://CVE-2018-1000880.patch \
+           file://CVE-2019-1000019.patch \
+           file://CVE-2019-1000020.patch \
 "
 
 SRC_URI[md5sum] = "4038e366ca5b659dae3efcc744e72120"
