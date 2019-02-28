@@ -43,6 +43,7 @@ SRC_URI += "\
             file://0004-bpo-33570-TLS-1.3-ciphers-for-OpenSSL-1.1.1-GH-6976.patch \
             file://0005-bpo-30714-ALPN-changes-for-OpenSSL-1.1.0f-2305.patch \
             file://CVE-2018-20406.patch \
+            file://python3-CVE-2019-5010.patch \
             file://run-ptest \
            "
 
