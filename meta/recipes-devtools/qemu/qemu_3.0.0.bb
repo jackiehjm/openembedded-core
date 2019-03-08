@@ -46,6 +46,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-scsi-generic-avoid-invalid-access-to-struct-when-emu.patch \
            file://CVE-2019-6501.patch \
            file://CVE-2019-6778.patch \
+           file://CVE-2019-3812.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
