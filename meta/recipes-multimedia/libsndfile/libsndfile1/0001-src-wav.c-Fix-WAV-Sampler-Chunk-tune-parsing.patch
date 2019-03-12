@@ -1,0 +1,62 @@
+From 7ea3f9d8746000cc82c016d0b5d48452bb80e9fe Mon Sep 17 00:00:00 2001
+From: Michael Panzlaff <michael.panzlaff@fau.de>
+Date: Sat, 28 Apr 2018 23:21:34 +0200
+Subject: [PATCH] src/wav.c: Fix WAV Sampler Chunk tune parsing
+
+Fix parsing of instrument fine tuning instrument field. There is still
+a possible rounding error involved which might require further
+investigation at some stage.
+
+Update the test as well.
+---
+ src/wav.c            |    9 +++++----
+ tests/command_test.c |    1 -
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+Index: libsndfile-1.0.28/src/wav.c
+===================================================================
+--- libsndfile-1.0.28.orig/src/wav.c
++++ libsndfile-1.0.28/src/wav.c
+@@ -1234,7 +1234,7 @@ static int
+ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
+ {	char buffer [512] ;
+ 	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count ;
+-	uint32_t note, start, end, type = -1, count ;
++	uint32_t note, pitch, start, end, type = -1, count ;
+ 	int j, k ;
+ 
+ 	chunklen += (chunklen & 1) ;
+@@ -1251,10 +1251,10 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, ui
+ 	bytesread += psf_binheader_readf (psf, "4", &note) ;
+ 	psf_log_printf (psf, "  Midi Note    : %u\n", note) ;
+ 
+-	bytesread += psf_binheader_readf (psf, "4", &dword) ;
+-	if (dword != 0)
++	bytesread += psf_binheader_readf (psf, "4", &pitch) ;
++	if (pitch != 0)
+ 	{	snprintf (buffer, sizeof (buffer), "%f",
+-					(1.0 * 0x80000000) / ((uint32_t) dword)) ;
++					(1.0 * 0x80000000) / ((uint32_t) pitch)) ;
+ 		psf_log_printf (psf, "  Pitch Fract. : %s\n", buffer) ;
+ 		}
+ 	else
+@@ -1360,6 +1360,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, ui
+ 		} ;
+ 
+ 	psf->instrument->basenote = note ;
++	psf->instrument->detune = (int8_t)(pitch / (0x40000000 / 25.0) + 0.5) ;
+ 	psf->instrument->gain = 1 ;
+ 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
+ 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
+Index: libsndfile-1.0.28/tests/command_test.c
+===================================================================
+--- libsndfile-1.0.28.orig/tests/command_test.c
++++ libsndfile-1.0.28/tests/command_test.c
+@@ -766,7 +766,6 @@ instrument_test (const char *filename, i
+ 		**	write_inst struct to hold the default value that the WAV
+ 		**	module should hold.
+ 		*/
+-		write_inst.detune = 0 ;
+ 		write_inst.key_lo = write_inst.velocity_lo = 0 ;
+ 		write_inst.key_hi = write_inst.velocity_hi = 127 ;
+ 		write_inst.gain = 1 ;

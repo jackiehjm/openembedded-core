@@ -15,6 +15,9 @@ SRC_URI = "http://www.mega-nerd.com/libsndfile/files/libsndfile-${PV}.tar.gz \
            file://CVE-2018-13139.patch \
            file://CVE-2018-19661-CVE-2018-19662.patch \
            file://CVE-2018-19432.patch \
+           file://0001-src-wav.c-Fix-WAV-Sampler-Chunk-tune-parsing.patch \
+           file://CVE-2018-19758.patch \
+           file://CVE-2019-3832.patch \
           "
 
 SRC_URI[md5sum] = "646b5f98ce89ac60cdb060fcd398247c"
