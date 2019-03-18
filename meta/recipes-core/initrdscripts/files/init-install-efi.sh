@@ -44,9 +44,10 @@ echo "Searching for hard drives ..."
 
 # Some eMMC devices have special sub devices such as mmcblk0boot0 etc
 # we're currently only interested in the root device so pick them wisely
-devices=`ls /sys/block/ | grep -v mmcblk` || true
+devices=`ls /sys/block/ | grep -v "mmcblk\|md\|dm"` || true
 mmc_devices=`ls /sys/block/ | grep "mmcblk[0-9]\{1,\}$"` || true
-devices="$devices $mmc_devices"
+md_devices=`cat /proc/mdstat  |grep -w active |awk -F":" '{print $1}'` || true
+devices="$devices $mmc_devices $md_devices"
 
 for device in $devices; do
     case $device in
@@ -165,6 +166,14 @@ if [ ! "${device#/dev/mmcblk}" = "${device}" ] || \
     rootwait="rootwait"
 fi
 
+# MD raid device use partition prefix charater 'p'
+# and it need a larger capacity to store initrd,
+# considering some debug purpose, enlarge it to 1G.
+if [ ! "${device#/dev/md}" = "${device}" ]; then
+    part_prefix="p"
+    boot_size=1024
+fi
+
 # USB devices also require rootwait
 if [ -n `readlink /dev/disk/by-id/usb* | grep $TARGET_DEVICE_NAME` ]; then
     rootwait="rootwait"
@@ -251,8 +260,14 @@ if [ -f /run/media/$1/EFI/BOOT/grub.cfg ]; then
     # Update grub config for the installed image
     # Delete the install entry
     sed -i "/menuentry 'install'/,/^}/d" $GRUBCFG
-    # Delete the initrd lines
-    sed -i "/initrd /d" $GRUBCFG
+    # initrd is necessary to boot from MD device
+    if [ ! "${device#/dev/md}" = "${device}" ]; then
+       cp /run/media/$1/initrd /boot
+       cp /run/media/$1/startup.nsh /boot
+    else
+       # Delete the initrd lines
+       sed -i "/initrd /d" $GRUBCFG
+    fi
     # Delete any LABEL= strings
     sed -i "s/ LABEL=[^ ]*/ /" $GRUBCFG
     # Replace root= and add additional standard boot options
