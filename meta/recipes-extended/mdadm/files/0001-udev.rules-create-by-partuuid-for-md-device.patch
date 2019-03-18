@@ -1,0 +1,29 @@
+From 7d1fa6afba936edb3e211f0ccdb58b1472b4bbf4 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Tue, 26 Feb 2019 07:05:42 +0000
+Subject: [PATCH] udev.rules: create by-partuuid for md device
+
+Create by-partuuid for every md devices.
+
+Upstream-Status: sent to linux-raid@vger.kernel.org
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ udev-md-raid-arrays.rules | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/udev-md-raid-arrays.rules b/udev-md-raid-arrays.rules
+index c95ec7b1e4a9..e326414efcbc 100644
+--- a/udev-md-raid-arrays.rules
++++ b/udev-md-raid-arrays.rules
+@@ -30,6 +30,7 @@ IMPORT{builtin}="blkid"
+ OPTIONS+="link_priority=100"
+ OPTIONS+="watch"
+ ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
++ENV{ID_FS_USAGE}=="filesystem|raid|other", ENV{ID_PART_ENTRY_UUID}=="?*", SYMLINK+="disk/by-partuuid/$env{ID_PART_ENTRY_UUID}"
+ ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_ENC}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_ENC}"
+ 
+ ENV{MD_LEVEL}=="raid[1-9]*", ENV{SYSTEMD_WANTS}+="mdmonitor.service"
+-- 
+2.11.0
+
