@@ -259,7 +259,7 @@ if [ -f /run/media/$1/EFI/BOOT/grub.cfg ]; then
     cp /run/media/$1/EFI/BOOT/grub.cfg $GRUBCFG
     # Update grub config for the installed image
     # Delete the install entry
-    sed -i "/menuentry 'install'/,/^}/d" $GRUBCFG
+    sed -i "/menuentry 'install/,/^}/d" $GRUBCFG
     # initrd is necessary to boot from MD device
     if [ ! "${device#/dev/md}" = "${device}" ]; then
        cp /run/media/$1/initrd /boot
