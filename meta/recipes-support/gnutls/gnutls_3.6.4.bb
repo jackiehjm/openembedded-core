@@ -20,6 +20,11 @@ SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar.xz \
            file://arm_eabi.patch \
            file://CVE-2018-16868.patch \
+           file://CVE-2019-3829.patch \
+           file://005eb5cbad48e22a4b0c36cd97f1c0225f3eed7f \
+           file://c2632449b011340199af11389c073d2d380b2e1e \
+           file://cacdb69aaf394120d761291f43983336d15c7be3 \
+           file://cve-2019-3829.pem \
 "
 
 SRC_URI[md5sum] = "63363d1c00601f4d11a5cadc8b5e0799"
@@ -54,6 +59,19 @@ do_configure_prepend() {
 	for dir in . lib; do
 		rm -f ${dir}/aclocal.m4 ${dir}/m4/libtool.m4 ${dir}/m4/lt*.m4
 	done
+}
+
+do_git_apply () {
+	cd ${S}
+	mkdir -p fuzz/gnutls_x509_verify_fuzzer.in
+	cp ${S}/../c2632449b011340199af11389c073d2d380b2e1e fuzz/gnutls_x509_verify_fuzzer.in
+	cp ${S}/../005eb5cbad48e22a4b0c36cd97f1c0225f3eed7f fuzz/gnutls_x509_verify_fuzzer.in
+	cp ${S}/../cacdb69aaf394120d761291f43983336d15c7be3 fuzz/gnutls_x509_verify_fuzzer.repro
+	cp ${S}/../cve-2019-3829.pem tests/cert-tests/data/
+}
+
+do_patch_append() {
+    bb.build.exec_func('do_git_apply', d)
 }
 
 PACKAGES =+ "${PN}-openssl ${PN}-xx"
