@@ -14,6 +14,8 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-Do-not-ignore-return-value-of-write.patch \
            file://0010-Do-not-hardcode-python-path-into-various-tools.patch \
            file://date-lt.patch \
+           file://0001-gsocketclient-Improve-handling-of-slow-initial-conne.patch \
+           file://CVE-2019-9633.patch \
            "
 
 SRC_URI_append_class-native = " file://relocate-modules.patch"
