@@ -65,6 +65,7 @@ SRC_URI_MUSL = "file://0001-Use-getenv-when-secure-versions-are-not-available.pa
                file://CVE-2018-16865-2.patch \
                file://CVE-2018-16866.patch \
                file://CVE-2018-16866-2.patch \
+               file://CVE-2019-6454.patch \
                "
 
 # Workaround undefined reference to `__stack_chk_fail_local' on qemux86 and qemuppc for musl
