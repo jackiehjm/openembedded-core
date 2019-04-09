@@ -250,20 +250,35 @@ echo "Preparing boot partition..."
 
 EFIDIR="/boot/EFI/BOOT"
 mkdir -p $EFIDIR
-# Copy the efi loader
-cp /run/media/$1/EFI/BOOT/*.efi $EFIDIR
 
-if [ -f /run/media/$1/EFI/BOOT/grub.cfg ]; then
+src_boot=""
+
+for i in `ls /dev/${live_dev_name}*`; do
+    i=${i#\/dev/}
+    if [ -f /run/media/$i/EFI/BOOT/*.efi ]; then
+        # Copy the efi loader
+        cp /run/media/$i/EFI/BOOT/*.efi $EFIDIR
+        src_boot=$i
+        break
+    fi
+done
+
+if [ -z "$src_boot" ]; then
+echo "No EFI bootloader found. Installation aborted."
+exit 1
+fi
+
+if [ -f /run/media/$src_boot/EFI/BOOT/grub.cfg ]; then
     root_part_uuid=$(blkid -o value -s PARTUUID ${rootfs})
     GRUBCFG="$EFIDIR/grub.cfg"
-    cp /run/media/$1/EFI/BOOT/grub.cfg $GRUBCFG
+    cp /run/media/$src_boot/EFI/BOOT/grub.cfg $GRUBCFG
     # Update grub config for the installed image
     # Delete the install entry
     sed -i "/menuentry 'install/,/^}/d" $GRUBCFG
     # initrd is necessary to boot from MD device
     if [ ! "${device#/dev/md}" = "${device}" ]; then
-       cp /run/media/$1/initrd /boot
-       cp /run/media/$1/startup.nsh /boot
+       cp /run/media/$src_boot/initrd /boot
+       cp /run/media/$src_boot/startup.nsh /boot
     else
        # Delete the initrd lines
        sed -i "/initrd /d" $GRUBCFG
@@ -275,11 +290,11 @@ if [ -f /run/media/$1/EFI/BOOT/grub.cfg ]; then
     sed -i "s/ root=[^ ]*/ root=PARTUUID=$root_part_uuid rw $rootwait quiet /g" $GRUBCFG
 fi
 
-if [ -d /run/media/$1/loader ]; then
+if [ -d /run/media/$src_boot/loader ]; then
     rootuuid=$(blkid -o value -s PARTUUID ${rootfs})
     SYSTEMDBOOT_CFGS="/boot/loader/entries/*.conf"
     # copy config files for systemd-boot
-    cp -dr /run/media/$1/loader /boot
+    cp -dr /run/media/$src_boot/loader /boot
     # delete the install entry
     rm -f /boot/loader/entries/install.conf
     # delete the initrd lines
@@ -297,7 +312,7 @@ umount /tgt_root
 # Copy kernel artifacts. To add more artifacts just add to types
 # For now just support kernel types already being used by something in OE-core
 for types in bzImage zImage vmlinux vmlinuz fitImage; do
-    for kernel in `find /run/media/$1/ -name $types*`; do
+    for kernel in `find /run/media/$src_boot/ -name $types*`; do
         cp $kernel /boot
     done
 done
