@@ -64,6 +64,7 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0001-CVE-2016-10739-getaddrinfo-Fully-parse-IPv4-address-.patch \
            file://0001-Restore-GLIBC_PRIVATE-ABI-after-CVE-2016-10739-fix-B.patch \
            file://0001-x86-64-memcmp-Use-unsigned-Jcc-instructions-on-size-.patch \
+           file://0001-regex-fix-read-overrun-BZ-24114.patch \
 "
 
 NATIVESDKFIXES ?= ""
