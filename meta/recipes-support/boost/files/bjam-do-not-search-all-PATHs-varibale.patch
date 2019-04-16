@@ -1,0 +1,49 @@
+bjam: do not search all PATHs varibale
+
+by default, bjam searches all $PATH.
+it make many time, and if the directories include nfs,
+it causes system hung.
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ tools/build/src/engine/build.jam | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tools/build/src/engine/build.jam b/tools/build/src/engine/build.jam
+index a92b70f..f866619 100644
+--- a/tools/build/src/engine/build.jam
++++ b/tools/build/src/engine/build.jam
+@@ -781,8 +781,8 @@ if $(OS) = NT
+ }
+ SUFEXE ?= "" ;
+ 
+-yacc ?= [ GLOB $(PATH) : yacc$(SUFEXE) ] ;
+-yacc ?= [ GLOB $(PATH) : bison$(SUFEXE) ] ;
++yacc ?= [ GLOB "" : yacc$(SUFEXE) ] ;
++yacc ?= [ GLOB "" : bison$(SUFEXE) ] ;
+ yacc ?= [ GLOB "$(ProgramFiles:J= )\\GnuWin32\\bin"
+     "C:\\Program Files\\GnuWin32\\bin" : bison$(SUFEXE) ] ;
+ yacc = $(yacc[1]) ;
+@@ -966,7 +966,7 @@ if $(OS) = NT
+ }
+ if $(UNIX) = true
+ {
+-    tar ?= [ GLOB $(PATH) : star bsdtar tar ] ;
++    tar ?= [ GLOB "" : star bsdtar tar ] ;
+     tar = $(tar[1]) ;
+     switch $(tar:D=:S=)
+     {
+@@ -1047,8 +1047,8 @@ rule .package ( dst-dir : src-files + )
+ }
+ 
+ # RPM distro file.
+-rpm-tool = [ GLOB $(PATH) : "rpmbuild" ] ;
+-rpm-tool ?= [ GLOB $(PATH) : "rpm" ] ;
++rpm-tool = [ GLOB "" : "rpmbuild" ] ;
++rpm-tool ?= [ GLOB "" : "rpm" ] ;
+ rpm-tool = $(rpm-tool[1]) ;
+ rule .rpm ( name : source )
+ {
+-- 
+2.18.1
+

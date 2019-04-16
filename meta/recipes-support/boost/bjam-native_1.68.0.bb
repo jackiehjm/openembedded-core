@@ -6,6 +6,7 @@ SECTION = "devel"
 inherit native
 
 SRC_URI += "file://bjam-native-build-bjam.debug.patch \
+            file://bjam-do-not-search-all-PATHs-varibale.patch \
 "
 
 do_compile() {
