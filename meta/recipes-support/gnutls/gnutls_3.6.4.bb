@@ -25,6 +25,7 @@ SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar
            file://c2632449b011340199af11389c073d2d380b2e1e \
            file://cacdb69aaf394120d761291f43983336d15c7be3 \
            file://cve-2019-3829.pem \
+           file://CVE-2019-3836.patch \
 "
 
 SRC_URI[md5sum] = "63363d1c00601f4d11a5cadc8b5e0799"
