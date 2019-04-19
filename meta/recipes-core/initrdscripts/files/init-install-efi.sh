@@ -226,6 +226,28 @@ mkdir /tgt_root
 mkdir /src_root
 mkdir -p /boot
 
+create_lvm() {
+    vgcreate wrl $rootfs
+    lvcreate -L 10G -n root wrl
+    rootfs="/dev/wrl/root"
+    mkfs.ext4 $rootfs
+}
+
+if [ ! "${device#/dev/md}" = "${device}" ]; then
+    while true; do
+        echo "Do you want to install rootfs to LVM? Press i to ignore, y to create LVM"
+        read answer2
+        if [ "$answer2" = "i" ]; then
+            echo "continue..."
+            break
+        elif [ "$answer2" = "y" ]; then
+            echo "Create LVM $rootfs ..."
+            create_lvm
+            break
+        fi
+    done
+fi
+
 # Handling of the target root partition
 mount $rootfs /tgt_root
 mount -o rw,loop,noatime,nodiratime /run/media/$1/$2 /src_root
@@ -285,9 +307,14 @@ if [ -f /run/media/$src_boot/EFI/BOOT/grub.cfg ]; then
     fi
     # Delete any LABEL= strings
     sed -i "s/ LABEL=[^ ]*/ /" $GRUBCFG
-    # Replace root= and add additional standard boot options
-    # We use root as a sentinel value, as vmlinuz is no longer guaranteed
-    sed -i "s/ root=[^ ]*/ root=PARTUUID=$root_part_uuid rw $rootwait quiet /g" $GRUBCFG
+    # for lvm there is no PARTUUID we use the LVM name directly.
+    if [ "$rootfs" == "/dev/wrl/root" ];then
+      sed -i "s@ root=[^ ]*@ root=$rootfs rw $rootwait quiet @g" $GRUBCFG
+    else
+      # Replace root= and add additional standard boot options
+      # We use root as a sentinel value, as vmlinuz is no longer guaranteed
+      sed -i "s/ root=[^ ]*/ root=PARTUUID=$root_part_uuid rw $rootwait quiet /g" $GRUBCFG
+    fi
 fi
 
 if [ -d /run/media/$src_boot/loader ]; then
