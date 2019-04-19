@@ -18,6 +18,7 @@ SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.t
         file://lighttpd \
         file://lighttpd.service \
         file://0001-Use-pkg-config-for-pcre-dependency-instead-of-config.patch \
+        file://CVE-2019-11072.patch \
         "
 
 SRC_URI[md5sum] = "0547831efda8492648b7f0c652865dfd"
