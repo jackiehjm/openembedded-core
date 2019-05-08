@@ -34,6 +34,7 @@ SRC_URI += "\
   file://0001-closes-bpo-34540-Convert-shutil._call_external_zip-t.patch \
   file://0001-2.7-bpo-34623-Use-XML_SetHashSalt-in-_elementtree-GH.patch \
   file://python2-CVE-2019-5010.patch \
+  file://python-2.7.15-CVE-2019-9948.patch \
 "
 
 S = "${WORKDIR}/Python-${PV}"
