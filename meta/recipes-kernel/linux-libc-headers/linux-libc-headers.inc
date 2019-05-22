@@ -58,6 +58,8 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 do_install() {
+	# The bits.h is needed by building turbostat
+	cp ${S}/include/linux/bits.h ${S}/include/uapi/linux/
 	oe_runmake headers_install INSTALL_HDR_PATH=${D}${exec_prefix}
 	# Kernel should not be exporting this header
 	rm -f ${D}${exec_prefix}/include/scsi/scsi.h

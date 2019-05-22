@@ -11,6 +11,7 @@ SRC_URI_append_libc-musl = "\
 
 SRC_URI_append = "\
     file://0001-scripts-Use-fixed-input-and-output-files-instead-of-.patch \
+    file://0001-locking-atomics-asm-generic-Move-some-macros-from-li.patch \
 "
 
 SRC_URI[md5sum] = "bee5fe53ee1c3142b8f0c12c0d3348f9"
