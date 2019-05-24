@@ -1,0 +1,37 @@
+From 31ed7582b3d036a21aae13d1222ed77062f6b469 Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Tue, 14 May 2019 11:40:55 +0300
+Subject: [PATCH] grub-mkconfig: Use -c instead of --printf for stat
+
+"--printf" only works with the stat variant provided by coreutils.
+
+With busybox, stat will fail with the following error:
+stat: unrecognized option '--printf=%T'
+
+Usage: stat [OPTIONS] FILE...
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/git/grub.git]
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ util/grub-mkconfig.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index f8496d2..628706d 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -144,7 +144,7 @@ GRUB_DEVICE_BOOT_UUID="`${grub_probe} --device ${GRUB_DEVICE_BOOT} --target=fs_u
+ GRUB_FS="`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2> /dev/null || echo unknown`"
+ 
+ if [ x"$GRUB_FS" = xunknown ]; then
+-    GRUB_FS="$(stat -f --printf=%T / || echo unknown)"
++    GRUB_FS="$(stat -f -c %T / || echo unknown)"
+ fi
+ 
+ if test -f ${sysconfdir}/default/grub ; then
+-- 
+2.18.1
+
