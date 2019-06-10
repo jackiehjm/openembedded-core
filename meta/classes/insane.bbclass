@@ -888,7 +888,7 @@ def package_qa_check_host_user(path, name, d, elf, messages):
         rootfs_path = path[len(dest):]
         check_uid = int(d.getVar('HOST_USER_UID'))
         if stat.st_uid == check_uid:
-            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_uid))
+            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination, or a rare race condition in the processing of the user ids. You should restart building this recipe, and if this issue is no longer reported, it was due to race condition." % (pn, rootfs_path, check_uid))
             return False
 
         check_gid = int(d.getVar('HOST_USER_GID'))
