@@ -82,6 +82,7 @@ do_install_append_class-native () {
     SYSROOT="${D}${base_prefix}" ${D}${sbindir}/update-ca-certificates
 }
 
-RDEPENDS_${PN} += "openssl"
+RDEPENDS_${PN}_class-target += "openssl-bin"
+RDEPENDS_${PN}_class-nativesdk += "openssl-bin"
 
 BBCLASSEXTEND = "native nativesdk"
