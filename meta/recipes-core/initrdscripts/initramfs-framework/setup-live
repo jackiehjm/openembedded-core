@@ -10,7 +10,7 @@ setup_run() {
 ROOT_IMAGE="rootfs.img"
 ISOLINUX=""
 ROOT_DISK=""
-shelltimeout=30
+shelltimeout=60
 
 	if [ -z "$bootparam_root" -o "$bootparam_root" = "/dev/ram0" ]; then
 		echo "Waiting for removable media..."
@@ -52,8 +52,8 @@ shelltimeout=30
 	fi
 
 	if [ "$bootparam_LABEL" != "boot" -a -f /init.d/$bootparam_LABEL.sh ] ; then
-		if [ -f /run/media/$i/$ISOLINUX/$ROOT_IMAGE ] ; then
-		    ./init.d/$bootparam_LABEL.sh $i/$ISOLINUX $ROOT_IMAGE $video_mode $vga_mode $console_params
+		if [ -f /run/media/$ROOT_DISK/$ISOLINUX/$ROOT_IMAGE ] ; then
+		    ./init.d/$bootparam_LABEL.sh $ROOT_DISK/$ISOLINUX $ROOT_IMAGE $video_mode $vga_mode $console_params
 		else
 		    fatal "Could not find $bootparam_LABEL script"
 		fi

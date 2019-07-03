@@ -124,13 +124,18 @@ device=/dev/$TARGET_DEVICE_NAME
 #
 # The udev automounter can cause pain here, kill it
 #
-rm -f /etc/udev/rules.d/automount.rules
-rm -f /etc/udev/scripts/mount*
+#rm -f /etc/udev/rules.d/automount.rules
+#rm -f /etc/udev/scripts/mount*
 
 #
 # Unmount anything the automounter had mounted
 #
-umount ${device}* 2> /dev/null || /bin/true
+#umount ${device}* 2> /dev/null || /bin/true
+
+echo "" > /etc/udev/scripts/mount.sh
+for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts | grep $TARGET_DEVICE_NAME`; do
+	umount $dir
+done
 
 if [ ! -b /dev/loop0 ] ; then
     mknod /dev/loop0 b 7 0
@@ -244,7 +249,13 @@ mkdir -p /boot
 
 # Handling of the target root partition
 mount $rootfs /tgt_root
+
+if [ ! -f /run/media/$1/$2 ]; then
+    mkdir -p /run/media/$1
+    mount /dev/$1 /run/media/$1 || true
+fi
 mount -o rw,loop,noatime,nodiratime /run/media/$1/$2 /src_root
+
 echo "Copying rootfs files..."
 cp -a /src_root/* /tgt_root
 if [ -d /tgt_root/etc/ ] ; then
