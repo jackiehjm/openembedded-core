@@ -2,6 +2,8 @@
 # Copyright (C) 2011 O.S. Systems Software LTDA.
 # Licensed on MIT
 
+_UDEV_DAEMON=`udev_daemon`
+
 setup_enabled() {
 	return 0
 }
@@ -10,10 +12,14 @@ setup_run() {
 ROOT_IMAGE="rootfs.img"
 ISOLINUX=""
 ROOT_DISK=""
-shelltimeout=30
+shelltimeout=60
 
 	if [ -z "$bootparam_root" -o "$bootparam_root" = "/dev/ram0" ]; then
 		echo "Waiting for removable media..."
+		udevadm trigger --action=add
+		udevadm settle
+		echo "Mounted filesystems"
+		mount |grep media
 		C=0
 		while true
 		do
@@ -34,7 +40,7 @@ shelltimeout=30
 		  fi
 		  # don't wait for more than $shelltimeout seconds, if it's set
 		  if [ -n "$shelltimeout" ]; then
-		      echo -n " " $(( $shelltimeout - $C ))
+		      echo " " $(( $shelltimeout - $C ))
 		      if [ $C -ge $shelltimeout ]; then
 		           echo "..."
 			   echo "Mounted filesystems"
@@ -43,17 +49,22 @@ shelltimeout=30
 		           cat /proc/partitions
 		           fatal "Cannot find $ROOT_IMAGE file in /run/media/* , dropping to a shell "
 		      fi
+		      udevadm trigger --action=add
+		      udevadm settle
+		      echo "Mounted filesystems"
+		      mount |grep media
 		      C=$(( C + 1 ))
 		  fi
 		  sleep 1
 		done
+		killall -9 "${_UDEV_DAEMON##*/}" 2>/dev/null
 		# The existing rootfs module has no support for rootfs images. Assign the rootfs image.
 		bootparam_root="/run/media/$ROOT_DISK/$ISOLINUX/$ROOT_IMAGE"
 	fi
 
 	if [ "$bootparam_LABEL" != "boot" -a -f /init.d/$bootparam_LABEL.sh ] ; then
-		if [ -f /run/media/$i/$ISOLINUX/$ROOT_IMAGE ] ; then
-		    ./init.d/$bootparam_LABEL.sh $i/$ISOLINUX $ROOT_IMAGE $video_mode $vga_mode $console_params
+		if [ -f /run/media/$ROOT_DISK/$ISOLINUX/$ROOT_IMAGE ] ; then
+		    ./init.d/$bootparam_LABEL.sh $ROOT_DISK/$ISOLINUX $ROOT_IMAGE $video_mode $vga_mode $console_params
 		else
 		    fatal "Could not find $bootparam_LABEL script"
 		fi
