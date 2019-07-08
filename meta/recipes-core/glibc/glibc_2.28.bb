@@ -127,7 +127,6 @@ do_compile () {
 			sed -i ${B}/elf/ldd -e "s#^RTLDLIST=.*\$#RTLDLIST=\"${prevrtld} ${RTLDLIST}\"#"
 		fi
 	fi
-
 }
 
 require glibc-package.inc
