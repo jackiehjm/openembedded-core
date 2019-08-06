@@ -9,7 +9,7 @@ RDEPENDS_${PN}_class-native = ""
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/dpkg/"
 
-inherit autotools gettext perlnative pkgconfig systemd perl-version
+inherit autotools gettext perlnative pkgconfig systemd perl-version update-alternatives
 
 python () {
     if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
@@ -93,7 +93,10 @@ RDEPENDS_${PN}-perl += "perl-module-carp perl-module-constant \
 # the bitbake version.
 #
 PACKAGES =+ "${PN}-start-stop"
-FILES_${PN}-start-stop = "${sbindir}/start-stop-daemon"
+FILES_${PN}-start-stop = "${sbindir}/start-stop-daemon.${BPN}"
+ALTERNATIVE_${PN}-start-stop = "start-stop-daemon"
+ALTERNATIVE_LINK_NAME[start-stop-daemon] = "${sbindir}/start-stop-daemon"
+ALTERNATIVE_PRIORITY = "100"
 
 RDEPENDS_${PN} += "${PN}-start-stop"
 
