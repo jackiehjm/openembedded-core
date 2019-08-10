@@ -56,7 +56,7 @@ export PYTHON_ABI
 # OE-core patches autoreconf to additionally run gnu-configize, which fails with this recipe
 EXTRA_AUTORECONF_append = " --exclude=gnu-configize"
 
-EXTRA_OECONF_append = " --without-lua --enable-python"
+EXTRA_OECONF_append = " --enable-python"
 EXTRA_OECONF_append_libc-musl = " --disable-nls"
 
 # --sysconfdir prevents rpm from attempting to access machine-specific configuration in sysroot/etc; we need to have it in rootfs
@@ -70,8 +70,9 @@ EXTRA_OECONF_append_class-nativesdk = " --sysconfdir=/etc --localstatedir=/var -
 
 BBCLASSEXTEND = "native nativesdk"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG_append = "lua"
 PACKAGECONFIG[imaevm] = "--with-imaevm,,ima-evm-utils"
+PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua"
 
 ASNEEDED = ""
 
