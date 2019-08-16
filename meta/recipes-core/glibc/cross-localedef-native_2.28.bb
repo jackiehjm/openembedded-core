@@ -36,6 +36,8 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0023-Define-DUMMY_LOCALE_T-if-not-defined.patch \
            file://0029-localedef-add-to-archive-uses-a-hard-coded-locale-pa.patch \
            file://0001-Add-no-hard-links-option-to-localedef-bug-23923.patch \
+           file://add-cross-localedef-hardlink.patch \
+           file://allow-compile-separate-from-util-linux-hardlink.patch \
 "
 # Makes for a rather long rev (22 characters), but...
 #
@@ -49,4 +51,5 @@ CFLAGS += "-fgnu89-inline -std=gnu99 -DIS_IN\(x\)='0'"
 do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${B}/localedef ${D}${bindir}/cross-localedef
+	install -m 0755 ${B}/cross-localedef-hardlink ${D}${bindir}/cross-localedef-hardlink
 }
