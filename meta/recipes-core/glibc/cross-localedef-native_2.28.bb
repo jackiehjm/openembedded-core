@@ -35,6 +35,7 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0022-eglibc-Forward-port-cross-locale-generation-support.patch \
            file://0023-Define-DUMMY_LOCALE_T-if-not-defined.patch \
            file://0029-localedef-add-to-archive-uses-a-hard-coded-locale-pa.patch \
+           file://0001-Add-no-hard-links-option-to-localedef-bug-23923.patch \
 "
 # Makes for a rather long rev (22 characters), but...
 #
