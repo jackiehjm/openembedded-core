@@ -229,9 +229,10 @@ build_hddimg() {
 		# exceeds 4GB, it is the single file's max size of FAT fs.
 		if [ -f ${HDDDIR}/rootfs.img ]; then
 			rootfs_img_size=`stat -c '%s' ${HDDDIR}/rootfs.img`
-			max_size=`expr 4 \* 1024 \* 1024 \* 1024`
+			max_size=`expr 8 \* 1024 \* 1024 \* 1024`
 			if [ $rootfs_img_size -ge $max_size ]; then
-				bberror "${HDDDIR}/rootfs.img rootfs size is greather than or equal to 4GB,"
+				bberror "${HDDDIR}/rootfs.img rootfs size is $rootfs_img_size,"
+				bberror "which is greather than or equal to 4GB($max_size),"
 				bberror "and this doesn't work on a FAT filesystem. You can either:"
 				bberror "1) Reduce the size of rootfs.img, or,"
 				bbfatal "2) Use wic, vmdk or vdi instead of hddimg\n"
