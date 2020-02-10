@@ -81,6 +81,8 @@ do_install() {
 # Ensure we don't race against "make scripts" during cpio
 do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 
-PACKAGES = "kernel-devsrc"
+PACKAGES = "kernel-devsrc-full"
 FILES_${PN} = "${KERNEL_SRC_PATH}"
 RDEPENDS_${PN} = "bc"
+
+INSANE_SKIP_${PN} = "arch"
